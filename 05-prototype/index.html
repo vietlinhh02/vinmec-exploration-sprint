@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vinmec SmartMatch AI — Trợ lý Tiền khám & Chọn Bác sĩ Thông minh</title>
+<!-- GOOGLE FONTS: BRICOLAGE GROTESQUE + INTER + JETBRAINS MONO -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- PHOSPHOR ICONS -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+  :root {
+    --canvas: #f9f7f3;
+    --surface-bone: #f3f0e8;
+    --surface-card: #ffffff;
+    --surface-dark: #202020;
+    --surface-deep: #000000;
+    --ink: #202020;
+    --body: #3a3a3a;
+    --charcoal: #575757;
+    --ash: #8d8d8d;
+    --hairline: rgba(32, 32, 32, 0.12);
+    --hairline-strong: #202020;
+    --primary: #0b5cab;
+    --primary-deep: #004880;
+    --primary-light: #eaf4ff;
+    --primary-border: #bcd7f5;
+    --accent-warm: #c59b27;
+    --accent-warm-light: #fef5e7;
+    --badge-success: #2b9a66;
+    --badge-success-light: #e8f6ef;
+    --badge-alert: #b03a2e;
+    --badge-alert-light: #fdecea;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--canvas); color: var(--ink);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  }
+
+  /* TOP WORKBENCH NAV (REPLICATE STYLE) */
+  .workbench-nav {
+    width: 100%; background: var(--canvas); border-bottom: 1px solid var(--hairline);
+    padding: 14px 32px; display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: "Bricolage Grotesque", sans-serif; font-size: 19px; font-weight: 800;
+    letter-spacing: -0.5px; color: var(--ink);
+  }
+  .nav-brand i { color: var(--primary); font-size: 22px; }
+  .nav-tag {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700;
+    background: var(--surface-bone); border: 1px solid var(--hairline); padding: 3px 9px;
+    border-radius: 9999px; color: var(--charcoal); letter-spacing: 0.4px;
+  }
+
+  .nav-center-pills { display: flex; gap: 8px; }
+  .nav-pill {
+    font-family: "Inter", sans-serif; font-size: 13px; font-weight: 600;
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 9999px;
+    padding: 6px 16px; color: var(--charcoal); cursor: pointer; text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .nav-pill:hover, .nav-pill.active {
+    background: var(--surface-dark); color: #fff; border-color: var(--surface-dark);
+  }
+
+  .nav-status {
+    display: flex; align-items: center; gap: 8px; font-family: "JetBrains Mono", monospace;
+    font-size: 11.5px; font-weight: 700; color: var(--badge-success); background: var(--badge-success-light);
+    padding: 6px 14px; border-radius: 9999px; border: 1px solid rgba(43,154,102,0.25);
+  }
+
+  /* MAIN WORKSPACE WRAPPER */
+  .workspace-container {
+    width: 100%; max-width: 1360px; padding: 28px 24px 60px;
+    display: flex; gap: 36px; align-items: flex-start; justify-content: center;
+  }
+
+  /* LEFT: MOBILE SIMULATOR */
+  .simulator-col {
+    display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+  }
+
+  .phone-wrapper {
+    width: 430px; height: 890px; background: #121214; border-radius: 50px; padding: 12px;
+    box-shadow: 0 25px 60px -15px rgba(0,0,0,0.35), 0 0 0 1px #27272a; position: relative;
+    user-select: none;
+  }
+  .phone-notch {
+    width: 130px; height: 26px; background: #121214; position: absolute; top: 12px; left: 50%;
+    transform: translateX(-50%); border-radius: 0 0 18px 18px; z-index: 100;
+  }
+  .phone-screen {
+    width: 100%; height: 866px; background: var(--canvas); border-radius: 40px; overflow-y: auto;
+    position: relative; display: flex; flex-direction: column; scroll-behavior: smooth;
+  }
+  .phone-screen::-webkit-scrollbar { width: 4px; }
+  .phone-screen::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
+
+  /* APP HEADER (INSIDE PHONE) */
+  .app-header {
+    background: linear-gradient(135deg, var(--surface-dark) 0%, #1a365d 100%);
+    color: #fff; padding: 34px 18px 16px; position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  }
+  .brand-row { display: flex; justify-content: space-between; align-items: center; }
+  .brand-logo {
+    font-family: "Bricolage Grotesque", sans-serif; font-size: 18px; font-weight: 800;
+    letter-spacing: -0.4px; display: flex; align-items: center; gap: 7px;
+  }
+  .brand-logo i { color: #facc15; font-size: 20px; }
+  .ai-tag {
+    background: rgba(255,255,255,0.18); backdrop-filter: blur(8px); padding: 3px 10px;
+    border-radius: 9999px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.25);
+    display: flex; align-items: center; gap: 4px; font-family: "JetBrains Mono", monospace;
+  }
+  .app-subtitle { font-size: 11.5px; opacity: 0.88; margin-top: 4px; font-weight: 400; }
+
+  /* STEP BAR */
+  .step-bar {
+    display: flex; justify-content: space-between; background: var(--surface-card); padding: 11px 16px;
+    border-bottom: 1px solid var(--hairline); font-size: 11px; font-weight: 700;
+  }
+  .step-item { display: flex; align-items: center; gap: 4px; color: var(--ash); }
+  .step-item.active { color: var(--primary); }
+  .step-item.done { color: var(--badge-success); }
+  .step-circle {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--surface-bone); display: flex;
+    align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 1px solid var(--hairline);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .step-item.active .step-circle { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .step-item.done .step-circle { background: var(--badge-success); color: #fff; border-color: var(--badge-success); }
+
+  /* MAIN APP BODY */
+  .app-body { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+  /* AI ASSISTANT SPEECH CARD */
+  .ai-assistant-card {
+    background: var(--surface-card); border-radius: 14px; padding: 12px 14px; border: 1px solid var(--hairline);
+    display: flex; gap: 12px; align-items: center;
+  }
+  .ai-avatar-box {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light);
+    display: flex; align-items: center; justify-content: center; color: var(--primary);
+    font-size: 20px; flex-shrink: 0; border: 1px solid var(--primary-border);
+  }
+  .ai-bubble-text { font-size: 12px; line-height: 1.45; color: var(--body); }
+  .ai-bubble-text b { color: var(--ink); }
+
+  /* BODY MAP INTERACTIVE CONTAINER */
+  .body-map-card {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 14px;
+    padding: 14px; display: flex; flex-direction: column; align-items: center;
+  }
+  .card-label {
+    font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--charcoal); margin-bottom: 8px; width: 100%; display: flex; align-items: center;
+    justify-content: space-between; font-family: "JetBrains Mono", monospace;
+  }
+  .body-map-interactive {
+    position: relative; width: 220px; height: 195px; background: var(--surface-bone);
+    border-radius: 12px; border: 1px solid var(--hairline); display: flex; align-items: center;
+    justify-content: center; margin: 4px 0 10px;
+  }
+  .body-silhouette-svg { width: 170px; height: 185px; opacity: 0.85; }
+  
+  /* HOTSPOTS */
+  .hotspot-point {
+    position: absolute; width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(11,92,171,0.2); border: 2px solid var(--primary); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+  }
+  .hotspot-point::after {
+    content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--primary);
+  }
+  .hotspot-point.active {
+    background: rgba(176,58,46,0.3); border-color: var(--badge-alert); transform: scale(1.15);
+  }
+  .hotspot-point.active::after { background: var(--badge-alert); }
+  .hotspot-chest { top: 68px; left: 98px; }
+  .hotspot-stomach { top: 102px; left: 98px; }
+  .hotspot-neck { top: 38px; left: 98px; }
+  .hotspot-joint { top: 130px; left: 54px; }
+
+  /* COMMON SYMPTOM PILLS */
+  .symptom-chips { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+  .symptom-chip {
+    background: var(--surface-bone); border: 1px solid var(--hairline); border-radius: 9999px;
+    padding: 6px 12px; font-size: 11.5px; font-weight: 600; color: var(--body); cursor: pointer;
+    transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .symptom-chip:hover { border-color: var(--primary); color: var(--primary); }
+  .symptom-chip.selected {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+  }
+
+  /* NATURAL LANGUAGE INPUT */
+  .input-card {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 14px; padding: 12px;
+  }
+  .voice-input-wrapper {
+    position: relative; display: flex; align-items: center; margin-top: 6px;
+  }
+  .voice-textarea {
+    width: 100%; border: 1px solid var(--hairline); border-radius: 12px; padding: 10px 42px 10px 12px;
+    font-size: 12px; font-family: "Inter", sans-serif; resize: none; background: var(--canvas);
+    color: var(--ink); height: 56px; outline: none; line-height: 1.4;
+  }
+  .voice-textarea:focus { border-color: var(--primary); background: #fff; }
+  .btn-mic {
+    position: absolute; right: 8px; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--surface-card); border: 1px solid var(--hairline); color: var(--primary);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .btn-mic:hover { background: var(--primary); color: #fff; }
+
+  /* PAIN INTENSITY SLIDER */
+  .pain-range-wrap { margin-top: 10px; width: 100%; }
+  .pain-labels { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--charcoal); font-weight: 600; margin-top: 4px; }
+  .range-slider {
+    width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px; background: #e2e8f0; outline: none;
+  }
+  .range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  /* BUDGET TIERS (REPLICATE PRICING CARDS) */
+  .budget-tier {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s ease;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .budget-tier:hover { border-color: var(--primary); }
+  .budget-tier.selected { border-color: var(--primary); background: var(--primary-light); }
+  .tier-info h4 {
+    font-family: "Bricolage Grotesque", sans-serif; font-size: 13.5px; font-weight: 700;
+    color: var(--ink); display: flex; align-items: center; gap: 6px;
+  }
+  .tier-info p { font-size: 11px; color: var(--charcoal); margin-top: 2px; }
+  .tier-price { font-size: 13px; font-weight: 800; color: var(--primary); font-family: "JetBrains Mono", monospace; }
+
+  /* DOCTOR MATCH CARDS */
+  .doc-card {
+    background: var(--surface-card); border-radius: 14px; border: 1px solid var(--hairline);
+    padding: 14px; margin-bottom: 10px; position: relative; overflow: hidden;
+  }
+  .doc-card.featured { border: 2px solid var(--primary); }
+  .doc-ribbon {
+    position: absolute; top: 0; right: 0; background: var(--primary); color: #fff;
+    font-size: 9.5px; font-weight: 800; padding: 3px 10px; border-radius: 0 0 0 10px;
+    text-transform: uppercase; letter-spacing: 0.4px; display: flex; align-items: center; gap: 4px;
+    font-family: "JetBrains Mono", monospace;
+  }
+  .doc-ribbon.expert { background: var(--surface-dark); }
+  .doc-ribbon.budget { background: var(--badge-success); }
+
+  .doc-header { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+  .doc-avatar-svg {
+    width: 46px; height: 46px; border-radius: 50%; background: var(--surface-bone);
+    border: 1px solid var(--hairline); flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  }
+  .doc-avatar-svg svg { width: 34px; height: 34px; }
+  .doc-names h4 { font-family: "Bricolage Grotesque", sans-serif; font-size: 14px; font-weight: 800; color: var(--ink); }
+  .doc-names p { font-size: 11px; color: var(--primary); font-weight: 700; margin-top: 1px; }
+  .doc-names .exp { font-size: 10.5px; color: var(--charcoal); }
+
+  .doc-ai-reason {
+    background: var(--surface-bone); border-left: 3px solid var(--primary); padding: 8px 10px;
+    border-radius: 4px; font-size: 11px; line-height: 1.45; color: var(--body); margin-bottom: 10px;
+  }
+  .doc-ai-reason strong { color: var(--primary-deep); }
+  .doc-meta {
+    display: flex; justify-content: space-between; align-items: center; padding-top: 8px;
+    border-top: 1px dashed var(--hairline); font-size: 11.5px;
+  }
+  .price-tag { font-weight: 800; font-size: 13.5px; color: var(--ink); font-family: "JetBrains Mono", monospace; }
+  .price-sub { font-size: 10.5px; color: var(--badge-success); font-weight: 700; display: block; }
+  .btn-book {
+    background: var(--primary); color: #fff; border: none; padding: 7px 16px;
+    border-radius: 9999px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+    transition: background 0.15s ease; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn-book:hover { background: var(--primary-deep); }
+
+  /* RED FLAG EMERGENCY POPUP */
+  .red-flag-screen {
+    display: none; background: #fff; border: 2px solid var(--badge-alert); border-radius: 16px;
+    padding: 24px 18px; text-align: center; box-shadow: 0 10px 30px rgba(176,58,46,0.18);
+    animation: shake 0.4s ease;
+  }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+  .red-flag-icon-box {
+    width: 60px; height: 60px; background: #fee2e2; border-radius: 50%; color: var(--badge-alert);
+    display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 12px;
+  }
+  .red-flag-title {
+    font-family: "Bricolage Grotesque", sans-serif; font-size: 16px; font-weight: 800;
+    color: var(--badge-alert); margin-bottom: 8px;
+  }
+  .red-flag-desc { font-size: 12px; line-height: 1.5; color: var(--body); margin-bottom: 16px; }
+  .btn-call-emergency {
+    background: var(--badge-alert); color: #fff; text-decoration: none; display: flex; align-items: center;
+    justify-content: center; gap: 8px; padding: 12px; border-radius: 9999px; font-size: 13.5px;
+    font-weight: 800; margin-bottom: 10px;
+  }
+  .btn-dismiss-emergency { background: none; border: none; color: var(--charcoal); font-size: 11.5px; cursor: pointer; text-decoration: underline; }
+
+  /* NAVIGATION BUTTONS */
+  .nav-action-bar { padding: 12px 16px; background: var(--surface-card); border-top: 1px solid var(--hairline); display: flex; gap: 10px; }
+  .btn-back {
+    background: var(--surface-bone); color: var(--body); border: 1px solid var(--hairline);
+    border-radius: 9999px; padding: 8px 16px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .btn-next {
+    flex: 1; background: var(--primary); color: #fff; border: none; border-radius: 9999px;
+    padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-next:hover { background: var(--primary-deep); }
+
+  /* RIGHT: REPLICATE AI LAB NOTEBOOK & TELEMETRY */
+  .notebook-col {
+    flex: 1; display: flex; flex-direction: column; gap: 20px;
+  }
+  .notebook-header {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .notebook-header h2 {
+    font-family: "Bricolage Grotesque", sans-serif; font-size: 28px; font-weight: 800;
+    letter-spacing: -0.8px; color: var(--ink);
+  }
+  .notebook-header p {
+    font-size: 14.5px; color: var(--body); line-height: 1.5;
+  }
+
+  /* SCENARIO SELECTOR STRIP */
+  .scenario-strip {
+    background: var(--surface-bone); border: 1px solid var(--hairline); border-radius: 16px;
+    padding: 16px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .scenario-title {
+    font-family: "JetBrains Mono", monospace; font-size: 11.5px; font-weight: 700;
+    color: var(--charcoal); text-transform: uppercase; letter-spacing: 0.6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .scenario-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+  .scenario-btn {
+    background: var(--surface-card); color: var(--ink); border: 1px solid var(--hairline);
+    padding: 8px 16px; border-radius: 9999px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .scenario-btn:hover { background: var(--surface-dark); color: #fff; border-color: var(--surface-dark); }
+  .scenario-btn.active { background: var(--surface-dark); color: #fff; border-color: var(--surface-dark); }
+  .scenario-btn.danger { border-color: rgba(176,58,46,0.3); color: var(--badge-alert); }
+  .scenario-btn.danger.active, .scenario-btn.danger:hover { background: var(--badge-alert); color: #fff; }
+
+  /* CODE BLOCK / LIVE INFERENCE LOG */
+  .code-block {
+    background: var(--surface-dark); border-radius: 14px; padding: 20px; color: #fcfcfc;
+    border: 1px solid var(--hairline-strong); display: flex; flex-direction: column; gap: 12px;
+  }
+  .code-tab-strip {
+    display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12);
+    padding-bottom: 10px; font-family: "JetBrains Mono", monospace; font-size: 11px;
+  }
+  .code-tab-label {
+    display: flex; align-items: center; gap: 6px; color: #38bdf8; font-weight: 700;
+  }
+  .code-body {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; line-height: 1.6;
+    color: rgba(252,252,252,0.9); overflow-x: auto; white-space: pre;
+  }
+  .code-body .tok-key { color: #f4a8a0; }
+  .code-body .tok-str { color: #a7f3d0; }
+  .code-body .tok-num { color: #fde047; }
+  .code-body .tok-com { color: #94a3b8; font-style: italic; }
+
+  /* BIODESIGN PRINCIPLES CARD */
+  .principles-card {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .principles-card h3 {
+    font-family: "Bricolage Grotesque", sans-serif; font-size: 16px; font-weight: 800;
+    color: var(--ink); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .principles-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .principles-card li {
+    font-size: 13px; line-height: 1.45; color: var(--body); display: flex; align-items: flex-start; gap: 8px;
+  }
+  .principles-card li i { color: var(--primary); font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- TOP WORKBENCH NAV -->
+<nav class="workbench-nav">
+  <div class="nav-brand">
+    <i class="ph-fill ph-first-aid"></i>
+    <span>VINMEC <strong>SMARTMATCH AI</strong></span>
+    <span class="nav-tag">LAB NOTEBOOK v2.4</span>
+  </div>
+  <div class="nav-center-pills">
+    <a href="#" class="nav-pill active"><i class="ph-bold ph-device-mobile"></i> Live App</a>
+    <a href="../slides.html" class="nav-pill" target="_blank"><i class="ph-bold ph-presentation"></i> Slide Deck (10p)</a>
+    <a href="../03-need-statement/need-statement.md" class="nav-pill"><i class="ph-bold ph-file-text"></i> Need Statement</a>
+  </div>
+  <div class="nav-status">
+    <i class="ph-fill ph-circle"></i> MODEL: STANFORD BIODESIGN K3
+  </div>
+</nav>
+
+<!-- MAIN WORKSPACE -->
+<div class="workspace-container">
+
+  <!-- LEFT: MOBILE SIMULATOR -->
+  <div class="simulator-col">
+    <div class="phone-wrapper">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" id="screen">
+        
+        <!-- HEADER -->
+        <div class="app-header">
+          <div class="brand-row">
+            <div class="brand-logo">
+              <i class="ph-fill ph-cross"></i>
+              <span>MYVINMEC <strong>AI</strong></span>
+            </div>
+            <div class="ai-tag">
+              <i class="ph-bold ph-sparkle"></i> SmartMatch v2.0
+            </div>
+          </div>
+          <div class="app-subtitle">Trợ lý Tiền khám &amp; Chọn Bác sĩ chuẩn chuyên môn</div>
+        </div>
+
+        <!-- PROGRESS STEPS -->
+        <div class="step-bar">
+          <div class="step-item active" id="step-ind-1"><div class="step-circle">1</div> Vị trí</div>
+          <div class="step-item" id="step-ind-2"><div class="step-circle">2</div> Cảm giác</div>
+          <div class="step-item" id="step-ind-3"><div class="step-circle">3</div> Ngân sách</div>
+          <div class="step-item" id="step-ind-4"><div class="step-circle">4</div> Bác sĩ</div>
+        </div>
+
+        <!-- APP BODY -->
+        <div class="app-body" id="app-body">
+          
+          <!-- STEP 1: CHỌN VÙNG CƠ THỂ & MÔ TẢ ĐỜI THƯỜNG -->
+          <div id="view-step-1" style="display:flex; flex-direction:column; gap:12px;">
+            <div class="ai-assistant-card">
+              <div class="ai-avatar-box"><i class="ph-bold ph-robot"></i></div>
+              <div class="ai-bubble-text">
+                Chào bạn! <b>Đừng lo nếu không biết tên chuyên khoa.</b> Hãy chạm vào vùng bạn thấy khó chịu nhất trên cơ thể hoặc nói bằng cảm giác đời thường nhé!
+              </div>
+            </div>
+
+            <!-- BODY MAP CARD -->
+            <div class="body-map-card">
+              <div class="card-label">
+                <span><i class="ph-bold ph-hand-pointing"></i> Chạm vị trí đau trên sơ đồ</span>
+                <span id="selectedRegionText" style="color:var(--primary); font-weight:800;">Ngực &amp; Thượng vị</span>
+              </div>
+              <div class="body-map-interactive">
+                <svg class="body-silhouette-svg" viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Head -->
+                  <circle cx="80" cy="24" r="14" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
+                  <!-- Neck -->
+                  <rect x="74" y="38" width="12" height="10" rx="3" fill="#cbd5e1"/>
+                  <!-- Torso -->
+                  <path d="M50 48 C50 48, 65 46, 80 46 C95 46, 110 48, 110 48 C118 52, 122 75, 120 100 C118 120, 115 136, 112 145 C98 147, 80 148, 48 145 C45 136, 42 120, 40 100 C38 75, 42 52, 50 48 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                  <!-- Chest Guidelines -->
+                  <path d="M60 75 Q80 85 100 75" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+                  <!-- Stomach Guidelines -->
+                  <circle cx="80" cy="110" r="4" fill="#94a3b8"/>
+                  <!-- Arms -->
+                  <path d="M42 54 L24 105 C22 110, 20 120, 18 135" stroke="#cbd5e1" stroke-width="10" stroke-linecap="round"/>
+                  <path d="M118 54 L136 105 C138 110, 140 120, 142 135" stroke="#cbd5e1" stroke-width="10" stroke-linecap="round"/>
+                </svg>
+
+                <!-- CLICKABLE HOTSPOTS -->
+                <div class="hotspot-point hotspot-neck" title="Cổ & Thái dương" onclick="selectHotspot('neck', 'Cổ & Thái dương')"></div>
+                <div class="hotspot-point hotspot-chest active" id="hs-chest" title="Vùng Ngực & Ức" onclick="selectHotspot('chest', 'Vùng Ngực & Ức')"></div>
+                <div class="hotspot-point hotspot-stomach" id="hs-stomach" title="Vùng Thượng vị & Dạ dày" onclick="selectHotspot('stomach', 'Vùng Thượng vị & Dạ dày')"></div>
+                <div class="hotspot-point hotspot-joint" title="Khớp & Cánh tay" onclick="selectHotspot('arm', 'Khớp vai & Cánh tay')"></div>
+              </div>
+
+              <!-- QUICK SENSATION TAGS -->
+              <div class="symptom-chips">
+                <div class="symptom-chip selected" onclick="toggleChip(this, 'Đau tức ngực')"><i class="ph-bold ph-heartbeat"></i> Đau tức ngực</div>
+                <div class="symptom-chip selected" onclick="toggleChip(this, 'Ợ chua sau ăn no')"><i class="ph-bold ph-fire"></i> Ợ chua sau ăn</div>
+                <div class="symptom-chip" onclick="toggleChip(this, 'Đau nhói khi hít sâu')"><i class="ph-bold ph-lightning"></i> Đau nhói khi hít sâu</div>
+                <div class="symptom-chip" onclick="toggleChip(this, 'Tê lan cánh tay trái')"><i class="ph-bold ph-warning"></i> Tê lan cánh tay trái</div>
+              </div>
+            </div>
+
+            <!-- NATURAL VOICE/TEXT -->
+            <div class="input-card">
+              <div class="card-label"><span><i class="ph-bold ph-microphone"></i> Hoặc mô tả theo lời bạn</span></div>
+              <div class="voice-input-wrapper">
+                <textarea class="voice-textarea" id="voiceText" placeholder="Ví dụ: Cứ ăn no xong là thấy tức nghẹn ở xương ức, râm ran nóng rát cổ họng...">Cứ sau bữa tối ăn no là đau tức nghẹn ở giữa ngực, cảm giác nóng rát trào lên cổ họng, hơi khó thở nhưng không đau nhói.</textarea>
+                <button class="btn-mic" onclick="simulateVoiceRecord()" title="Ghi âm giọng nói"><i class="ph-bold ph-microphone"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: MỨC ĐỘ & THỜI GIAN -->
+          <div id="view-step-2" style="display:none; flex-direction:column; gap:12px;">
+            <div class="ai-assistant-card">
+              <div class="ai-avatar-box"><i class="ph-bold ph-chart-bar"></i></div>
+              <div class="ai-bubble-text">
+                Cảm giác này kéo dài bao lâu rồi và mức độ ảnh hưởng đến sinh hoạt của bạn như thế nào?
+              </div>
+            </div>
+
+            <div class="input-card">
+              <div class="card-label"><span><i class="ph-bold ph-gauge"></i> Thước đo mức độ đau (1 - 10)</span></div>
+              <div class="pain-range-wrap">
+                <input type="range" class="range-slider" min="1" max="10" value="4" id="painSlider" oninput="updatePainLabel(this.value)">
+                <div class="pain-labels">
+                  <span>1 (Âm ỉ)</span>
+                  <span id="painValDisplay" style="color:var(--primary); font-weight:800;">4 - Vừa phải</span>
+                  <span>10 (Dữ dội)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-card">
+              <div class="card-label"><span><i class="ph-bold ph-clock"></i> Thời gian khởi phát</span></div>
+              <div class="symptom-chips" style="margin-top:6px;">
+                <div class="symptom-chip selected" onclick="selectDuration(this, 'recent')">Mới bị 2-3 ngày nay</div>
+                <div class="symptom-chip" onclick="selectDuration(this, 'subacute')">Kéo dài 1 - 2 tuần</div>
+                <div class="symptom-chip" onclick="selectDuration(this, 'chronic')">Mạn tính tái đi tái lại (> 1 tháng)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: NGÂN SÁCH & KHUNG GIỜ -->
+          <div id="view-step-3" style="display:none; flex-direction:column; gap:12px;">
+            <div class="ai-assistant-card">
+              <div class="ai-avatar-box"><i class="ph-bold ph-coins"></i></div>
+              <div class="ai-bubble-text">
+                Vinmec minh bạch chi phí ngay từ đầu. Hãy chọn phân tầng bác sĩ phù hợp với mong muốn của bạn:
+              </div>
+            </div>
+
+            <div class="budget-tier selected" onclick="selectTier(this, 'standard')">
+              <div class="tier-info">
+                <h4><i class="ph-bold ph-shield-check"></i> Tiêu chuẩn (BS Chuyên khoa I / Thạc sĩ)</h4>
+                <p>Khám ngoại trú chuẩn, giàu kinh nghiệm, điều trị dứt điểm ca thường</p>
+              </div>
+              <div class="tier-price">550.000 đ</div>
+            </div>
+
+            <div class="budget-tier" onclick="selectTier(this, 'expert')">
+              <div class="tier-info">
+                <h4><i class="ph-bold ph-crown"></i> Chuyên gia (PGS / Tiến sĩ / Trưởng khoa)</h4>
+                <p>Hội chẩn ca khó, bệnh mạn tính lâu năm hoặc yêu cầu đầu ngành</p>
+              </div>
+              <div class="tier-price">1.500.000 đ</div>
+            </div>
+
+            <div class="budget-tier" onclick="selectTier(this, 'urgent')">
+              <div class="tier-info">
+                <h4><i class="ph-bold ph-lightning"></i> Khám sớm trong 2 giờ tới</h4>
+                <p>Ưu tiên xếp lượt với bác sĩ đang trực tại phòng khám</p>
+              </div>
+              <div class="tier-price">700.000 đ</div>
+            </div>
+
+            <div class="input-card">
+              <div class="card-label"><span><i class="ph-bold ph-calendar"></i> Khung giờ mong muốn</span></div>
+              <div class="symptom-chips" style="margin-top:6px;">
+                <div class="symptom-chip selected" onclick="selectChipOnly(this)">Sáng mai (08:30 - 10:30)</div>
+                <div class="symptom-chip" onclick="selectChipOnly(this)">Chiều mai (14:00 - 16:30)</div>
+                <div class="symptom-chip" onclick="selectChipOnly(this)">Khám ngoài giờ (sau 17h)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: KẾT QUẢ SMARTMATCH AI -->
+          <div id="view-step-4" style="display:none; flex-direction:column; gap:12px;">
+            <!-- CLINICAL TRIAGE EXPLANATION -->
+            <div style="background:linear-gradient(135deg, #0b5cab 0%, #004880 100%); color:#fff; border-radius:14px; padding:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:700; color:#fde047; text-transform:uppercase; letter-spacing:0.5px;">
+                  <i class="ph-bold ph-sparkle"></i> PHÂN TÍCH LÂM SÀNG AI (TRIAGE)
+                </span>
+                <span style="background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:9999px; font-size:10px; font-family:'JetBrains Mono', monospace;">Độ tin cậy: 94%</span>
+              </div>
+              <h4 style="font-family:'Bricolage Grotesque', sans-serif; font-size:15px; font-weight:800; margin-bottom:4px;">
+                Đề xuất Chuyên khoa: NỘI TIÊU HÓA &amp; TRÀO NGƯỢC DẠ DÀY
+              </h4>
+              <p style="font-size:11.5px; opacity:0.92; line-height:1.45;">
+                Cảm giác đau tức ngực kèm ợ chua sau khi ăn no hướng nhiều đến hội chứng trào ngược thực quản (GERD), không có dấu hiệu suy vành cấp. Khám Tiêu hóa giúp tránh nhầm lẫn sang Tim mạch (tiết kiệm ~1.200.000đ tiền cận lâm sàng không cần thiết).
+              </p>
+            </div>
+
+            <!-- CARD 1: BEST MATCH (FEATURED) -->
+            <div class="doc-card featured">
+              <div class="doc-ribbon"><i class="ph-bold ph-star"></i> PHÙ HỢP NHẤT</div>
+              <div class="doc-header">
+                <div class="doc-avatar-svg">
+                  <svg viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="14" r="7" fill="#cbd5e1"/>
+                    <path d="M8 36 C8 27 13 24 20 24 C27 24 32 27 32 36" fill="#3b82f6"/>
+                    <!-- Stethoscope -->
+                    <path d="M15 24 C15 28 25 28 25 24" stroke="#f59e0b" stroke-width="2" fill="none"/>
+                  </svg>
+                </div>
+                <div class="doc-names">
+                  <h4>BS. CKI Nguyễn Văn Hoàng</h4>
+                  <p>Chuyên khoa Tiêu hóa - Gan mật</p>
+                  <span class="exp">14 năm kinh nghiệm · Trị trào ngược &amp; HP</span>
+                </div>
+              </div>
+              <div class="doc-ai-reason">
+                <strong>Lý do AI kết nối:</strong> Triệu chứng mới khởi phát 2 ngày, mức độ nhẹ-vừa. BS Hoàng có thế mạnh điều trị ngoại trú rất tốt, chi phí tiêu chuẩn 550.000đ giúp bạn tiết kiệm 65% so với chuyên gia cấp cao.
+              </div>
+              <div class="doc-meta">
+                <div>
+                  <span class="price-tag">550.000 đ</span>
+                  <span class="price-sub"><i class="ph-bold ph-check"></i> 09:00 sáng mai</span>
+                </div>
+                <button class="btn-book" onclick="confirmBooking('BS. CKI Nguyễn Văn Hoàng', '09:00 sáng mai', '550.000 đ')">
+                  <i class="ph-bold ph-calendar-plus"></i> Đặt lịch này
+                </button>
+              </div>
+            </div>
+
+            <!-- CARD 2: EXPERT -->
+            <div class="doc-card">
+              <div class="doc-ribbon expert"><i class="ph-bold ph-crown"></i> CHUYÊN GIA</div>
+              <div class="doc-header">
+                <div class="doc-avatar-svg" style="background:#fef3c7;">
+                  <svg viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="14" r="7" fill="#cbd5e1"/>
+                    <!-- Glasses -->
+                    <circle cx="17" cy="14" r="2.5" stroke="#202020" stroke-width="1" fill="none"/>
+                    <circle cx="23" cy="14" r="2.5" stroke="#202020" stroke-width="1" fill="none"/>
+                    <path d="M8 36 C8 27 13 24 20 24 C27 24 32 27 32 36" fill="#202020"/>
+                  </svg>
+                </div>
+                <div class="doc-names">
+                  <h4>PGS. TS. Trần Đức Công</h4>
+                  <p>Phó Viện trưởng Viện Tiêu hóa Vinmec</p>
+                  <span class="exp">28 năm kinh nghiệm · Nội soi can thiệp &amp; ca khó</span>
+                </div>
+              </div>
+              <div class="doc-ai-reason">
+                <strong>Lý do AI kết nối:</strong> Phù hợp nếu bạn có tiền sử trào ngược kháng trị nhiều năm hoặc muốn chuyên gia đầu ngành trực tiếp hội chẩn.
+              </div>
+              <div class="doc-meta">
+                <div>
+                  <span class="price-tag">1.500.000 đ</span>
+                  <span class="price-sub" style="color:var(--charcoal);"><i class="ph-bold ph-clock"></i> 15:30 chiều mai (còn 2 slot)</span>
+                </div>
+                <button class="btn-book" style="background:var(--surface-dark);" onclick="confirmBooking('PGS. TS. Trần Đức Công', '15:30 chiều mai', '1.500.000 đ')">
+                  <i class="ph-bold ph-calendar-plus"></i> Đặt chuyên gia
+                </button>
+              </div>
+            </div>
+
+            <!-- CARD 3: EARLY SLOT -->
+            <div class="doc-card">
+              <div class="doc-ribbon budget"><i class="ph-bold ph-lightning"></i> KHÁM SỚM</div>
+              <div class="doc-header">
+                <div class="doc-avatar-svg" style="background:#e8f6ef;">
+                  <svg viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="14" r="7" fill="#cbd5e1"/>
+                    <path d="M8 36 C8 27 13 24 20 24 C27 24 32 27 32 36" fill="#1e8e5a"/>
+                  </svg>
+                </div>
+                <div class="doc-names">
+                  <h4>ThS. BS. Lê Thị Mai</h4>
+                  <p>Khoa Nội tổng quát &amp; Tiêu hóa</p>
+                  <span class="exp">9 năm kinh nghiệm · Khám vào ca đầu tiên</span>
+                </div>
+              </div>
+              <div class="doc-meta">
+                <div>
+                  <span class="price-tag">700.000 đ</span>
+                  <span class="price-sub" style="color:var(--badge-success);"><i class="ph-bold ph-lightning"></i> 07:30 sáng mai (Slot sớm nhất)</span>
+                </div>
+                <button class="btn-book" style="background:var(--badge-success);" onclick="confirmBooking('ThS. BS. Lê Thị Mai', '07:30 sáng mai', '700.000 đ')">
+                  <i class="ph-bold ph-calendar-plus"></i> Chọn ca sớm
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RED FLAG EMERGENCY MODAL -->
+          <div class="red-flag-screen" id="emergencyView">
+            <div class="red-flag-icon-box"><i class="ph-fill ph-siren"></i></div>
+            <div class="red-flag-title">CẢNH BÁO DẤU HIỆU CẤP CỨU NGUY HIỂM</div>
+            <div class="red-flag-desc">
+              Triệu chứng bạn mô tả (đau thắt ngực lan cánh tay, vã mồ hôi, khó thở) có thể là dấu hiệu của <b>Cơn thiếu máu cơ tim cấp hoặc Đột quỵ</b>.<br><br>
+              Hệ thống <b>tạm dừng quy trình đặt lịch khám thông thường</b>. Vui lòng gọi cấp cứu hoặc đến ngay phòng cấp cứu gần nhất!
+            </div>
+            <a href="tel:115" class="btn-call-emergency" onclick="alert('Đang kết nối Tổng đài Cấp cứu Vinmec 115...')">
+              <i class="ph-bold ph-phone-call"></i> GỌI CẤP CỨU VINMEC (115) NGAY
+            </a>
+            <button class="btn-dismiss-emergency" onclick="dismissEmergency()">
+              <i class="ph-bold ph-arrow-counter-clockwise"></i> Quay lại chế độ thử nghiệm thông thường
+            </button>
+          </div>
+
+        </div>
+
+        <!-- FOOTER NAV BAR (INSIDE PHONE) -->
+        <div class="nav-action-bar" id="phoneNavBar">
+          <button class="btn-back" id="btnBack" onclick="prevStep()"><i class="ph-bold ph-arrow-left"></i> Quay lại</button>
+          <button class="btn-next" id="btnNext" onclick="nextStep()">Tiếp tục: Cảm giác <i class="ph-bold ph-arrow-right"></i></button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: REPLICATE AI LAB NOTEBOOK & TELEMETRY -->
+  <div class="notebook-col">
+    <div class="notebook-header">
+      <h2>Interactive Clinical Triage &amp; Matching Inspector</h2>
+      <p>
+        Mô phỏng cơ chế tiền khám ảo AI theo chuẩn <b>Stanford Biodesign</b>: Giải quyết rào cản từ ngữ y khoa, chống ngõ cụt khi chuyên gia kín lịch và lọc cờ đỏ cấp cứu sinh mạng.
+      </p>
+    </div>
+
+    <!-- SCENARIOS -->
+    <div class="scenario-strip">
+      <div class="scenario-title">
+        <i class="ph-bold ph-flask"></i> CÁC KỊCH BẢN THỬ NGHIỆM LÂM SÀNG (TEST SCENARIOS)
+      </div>
+      <div class="scenario-buttons">
+        <button class="scenario-btn active" id="btn-sc-gerd" onclick="loadScenario('gerd')">
+          <i class="ph-bold ph-heartbeat"></i> 1: Đau ngực &amp; Ợ chua (Tiêu hóa vs Tim)
+        </button>
+        <button class="scenario-btn" id="btn-sc-spine" onclick="loadScenario('spine')">
+          <i class="ph-bold ph-bone"></i> 2: Tê bì tay &amp; Vai gáy (Thần kinh cột sống)
+        </button>
+        <button class="scenario-btn" id="btn-sc-loadbalance" onclick="loadScenario('loadbalance')">
+          <i class="ph-bold ph-scales"></i> 3: GS. Dũng kín lịch (Cân bằng tải Ekip)
+        </button>
+        <button class="scenario-btn danger" id="btn-sc-emergency" onclick="loadScenario('emergency')">
+          <i class="ph-bold ph-warning-octagon"></i> 4: Cờ đỏ Cấp cứu 115 (Red Flag)
+        </button>
+        <button class="scenario-btn" onclick="resetForm()">
+          <i class="ph-bold ph-arrows-clockwise"></i> Đặt lại form
+        </button>
+      </div>
+    </div>
+
+    <!-- CODE BLOCK: LIVE INFERENCE TELEMETRY -->
+    <div class="code-block">
+      <div class="code-tab-strip">
+        <div class="code-tab-label">
+          <i class="ph-bold ph-terminal-window"></i>
+          <span>LIVE INFERENCE LOG // MODEL: SMARTMATCH-TRIAGE-V2</span>
+        </div>
+        <span style="color:#94a3b8; font-size:10.5px;">latency: 184ms · tokens: 320</span>
+      </div>
+      <div class="code-body" id="liveCodeLog">
+<span class="tok-com">// 1. Entity Extraction from Patient Natural Language:</span>
+{
+  <span class="tok-key">"raw_text"</span>: <span class="tok-str">"Cứ ăn no là đau tức nghẹn ở giữa ngực, nóng rát trào lên cổ họng..."</span>,
+  <span class="tok-key">"symptom_cluster"</span>: [<span class="tok-str">"postprandial_chest_fullness"</span>, <span class="tok-str">"acid_regurgitation"</span>],
+  <span class="tok-key">"pain_score"</span>: <span class="tok-num">4</span>,
+  <span class="tok-key">"red_flag_detected"</span>: <span class="tok-num">false</span>,
+  
+<span class="tok-com">// 2. Stanford Biodesign Differential Triage:</span>
+  <span class="tok-key">"recommended_department"</span>: <span class="tok-str">"Gastroenterology"</span>,
+  <span class="tok-key">"differential_risk"</span>: <span class="tok-str">"Cardiology (Low priority, no angina pectoris radiation)"</span>,
+  <span class="tok-key">"estimated_unnecessary_cost_saved"</span>: <span class="tok-str">"1.200.000 VNĐ"</span>,
+
+<span class="tok-com">// 3. Multi-tier Doctor Matching:</span>
+  <span class="tok-key">"best_match"</span>: {
+    <span class="tok-key">"doctor"</span>: <span class="tok-str">"BS. CKI Nguyễn Văn Hoàng"</span>,
+    <span class="tok-key">"tier"</span>: <span class="tok-str">"Standard (550.000 VNĐ)"</span>,
+    <span class="tok-key">"reason"</span>: <span class="tok-str">"Subacute onset, optimal outpatient protocol"</span>
+  }
+}
+      </div>
+    </div>
+
+    <!-- BIODESIGN PRINCIPLES CARD -->
+    <div class="principles-card">
+      <h3><i class="ph-bold ph-shield-check" style="color:var(--primary);"></i> 4 Nguyên tắc Trách nhiệm Y tế &amp; Đạo đức (Vinmec Compliance)</h3>
+      <ul>
+        <li>
+          <i class="ph-bold ph-check-circle"></i>
+          <div><b>Triage, Not Diagnosis (Phân luồng, không chẩn đoán):</b> Hệ thống tuyệt đối không đưa ra kết luận bệnh học thay bác sĩ, chỉ gợi ý chuyên khoa và bác sĩ có chuyên môn sâu tương ứng.</div>
+        </li>
+        <li>
+          <i class="ph-bold ph-check-circle"></i>
+          <div><b>Cờ đỏ Cấp cứu (Emergency Red Flag):</b> Khóa ngay luồng đặt hẹn thường khi phát hiện nguy cơ nhồi máu cơ tim hoặc đột quỵ, ưu tiên cứu mạng là trên hết.</div>
+        </li>
+        <li>
+          <i class="ph-bold ph-check-circle"></i>
+          <div><b>Chống thiên vị thương mại (Anti-Upselling):</b> Luôn ưu tiên hiển thị gói Tiêu chuẩn (500k-700k) cho các ca nhẹ ngoại trú, không cố tình dồn người bệnh vào Giáo sư 2 triệu.</div>
+        </li>
+        <li>
+          <i class="ph-bold ph-check-circle"></i>
+          <div><b>Cân bằng tải &amp; Chống ngõ cụt:</b> Khi bác sĩ đầu ngành kín lịch, hệ thống gợi ý chuyên gia cùng ekip thay vì báo đỏ cụt ngủn như app hiện tại.</div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- INTERACTION SCRIPT -->
+<script>
+  let currentStep = 1;
+
+  function updateStepsUI() {
+    for (let i = 1; i <= 4; i++) {
+      const view = document.getElementById('view-step-' + i);
+      const ind = document.getElementById('step-ind-' + i);
+      if (view) view.style.display = (i === currentStep) ? 'flex' : 'none';
+      if (ind) {
+        ind.className = 'step-item';
+        if (i === currentStep) ind.classList.add('active');
+        if (i < currentStep) ind.classList.add('done');
+      }
+    }
+
+    const btnBack = document.getElementById('btnBack');
+    const btnNext = document.getElementById('btnNext');
+    if (btnBack) btnBack.style.visibility = (currentStep === 1) ? 'hidden' : 'visible';
+    
+    if (btnNext) {
+      if (currentStep === 1) btnNext.innerHTML = 'Tiếp tục: Cảm giác <i class="ph-bold ph-arrow-right"></i>';
+      else if (currentStep === 2) btnNext.innerHTML = 'Tiếp tục: Ngân sách <i class="ph-bold ph-arrow-right"></i>';
+      else if (currentStep === 3) btnNext.innerHTML = 'Phân tích &amp; Tìm bác sĩ <i class="ph-bold ph-sparkle"></i>';
+      else if (currentStep === 4) btnNext.innerHTML = '<i class="ph-bold ph-check"></i> Hoàn tất tiền khám';
+    }
+  }
+
+  function nextStep() {
+    if (currentStep < 4) {
+      currentStep++;
+      updateStepsUI();
+      document.getElementById('screen').scrollTop = 0;
+    } else {
+      alert('Đã hoàn tất chọn bác sĩ thành công (Mô phỏng luồng tiền khám)!');
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 1) {
+      currentStep--;
+      updateStepsUI();
+      document.getElementById('screen').scrollTop = 0;
+    }
+  }
+
+  function selectHotspot(region, name) {
+    document.querySelectorAll('.hotspot-point').forEach(p => p.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById('selectedRegionText').innerText = name;
+  }
+
+  function toggleChip(el, text) {
+    el.classList.toggle('selected');
+    const textarea = document.getElementById('voiceText');
+    if (el.classList.contains('selected')) {
+      if (text.includes('lan cánh tay trái')) {
+        showEmergency();
+      }
+    }
+  }
+
+  function selectChipOnly(el) {
+    el.parentElement.querySelectorAll('.symptom-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function selectDuration(el, type) {
+    el.parentElement.querySelectorAll('.symptom-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function selectTier(el, tier) {
+    document.querySelectorAll('.budget-tier').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function updatePainLabel(val) {
+    const d = document.getElementById('painValDisplay');
+    if (val <= 3) d.innerText = val + ' - Âm ỉ';
+    else if (val <= 6) d.innerText = val + ' - Vừa phải';
+    else if (val <= 8) d.innerText = val + ' - Dữ dội';
+    else d.innerText = val + ' - Cực độ (Khẩn cấp)';
+  }
+
+  function simulateVoiceRecord() {
+    const txt = document.getElementById('voiceText');
+    txt.value = 'Đang nghe giọng nói... "Tôi bị đau quặn từng cơn ở thượng vị, ăn dầu mỡ vào là chướng bụng..."';
+    setTimeout(() => {
+      txt.value = 'Tôi bị đau quặn từng cơn ở thượng vị sau bữa ăn, ăn đồ dầu mỡ vào là ợ hơi chướng bụng khó chịu.';
+    }, 1200);
+  }
+
+  function loadScenario(type) {
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('btn-sc-' + type);
+    if (btn) btn.classList.add('active');
+
+    dismissEmergency();
+
+    if (type === 'emergency') {
+      showEmergency();
+      document.getElementById('liveCodeLog').innerHTML = `
+<span class="tok-com">// RED FLAG TRIAGE TRIGGERED:</span>
+{
+  <span class="tok-key">"alert_type"</span>: <span class="tok-str">"EMERGENCY_RED_FLAG"</span>,
+  <span class="tok-key">"symptoms"</span>: [<span class="tok-str">"crushing_chest_pain"</span>, <span class="tok-str">"left_arm_radiation"</span>, <span class="tok-str">"diaphoresis"</span>],
+  <span class="tok-key">"suspected_condition"</span>: <span class="tok-str">"Acute Coronary Syndrome / Myocardial Infarction"</span>,
+  <span class="tok-key">"routine_booking_locked"</span>: <span class="tok-num">true</span>,
+  <span class="tok-key">"action"</span>: <span class="tok-str">"DIRECT_HOTLINE_115_VINMEC_EMERGENCY"</span>
+}
+      `;
+      return;
+    }
+
+    if (type === 'gerd') {
+      currentStep = 4;
+      updateStepsUI();
+      document.getElementById('liveCodeLog').innerHTML = `
+<span class="tok-com">// SCENARIO 1: GERD vs CARDIOLOGY DIFFERENTIAL:</span>
+{
+  <span class="tok-key">"symptom_cluster"</span>: [<span class="tok-str">"postprandial_chest_pain"</span>, <span class="tok-str">"acid_regurgitation"</span>],
+  <span class="tok-key">"recommended_department"</span>: <span class="tok-str">"Gastroenterology"</span>,
+  <span class="tok-key">"cost_difference_saved"</span>: <span class="tok-str">"1.200.000 VNĐ"</span>,
+  <span class="tok-key">"matched_doctor"</span>: <span class="tok-str">"BS. CKI Nguyễn Văn Hoàng (550.000 VNĐ)"</span>
+}
+      `;
+    } else if (type === 'spine') {
+      currentStep = 4;
+      updateStepsUI();
+      document.getElementById('liveCodeLog').innerHTML = `
+<span class="tok-com">// SCENARIO 2: CERVICAL RADICULOPATHY:</span>
+{
+  <span class="tok-key">"symptom_cluster"</span>: [<span class="tok-str">"neck_stiffness"</span>, <span class="tok-str">"numb_fingers_pins_and_needles"</span>],
+  <span class="tok-key">"recommended_department"</span>: <span class="tok-str">"Spine & Neurosurgery"</span>,
+  <span class="tok-key">"matched_doctor"</span>: <span class="tok-str">"ThS. BS. Nguyễn Mạnh Thắng (Cột sống cổ)"</span>
+}
+      `;
+    } else if (type === 'loadbalance') {
+      currentStep = 4;
+      updateStepsUI();
+      document.getElementById('liveCodeLog').innerHTML = `
+<span class="tok-com">// SCENARIO 3: ANTI-DEAD-END LOAD BALANCING:</span>
+{
+  <span class="tok-key">"requested_specialist"</span>: <span class="tok-str">"GS. Trần Trung Dũng (Fully Booked)"</span>,
+  <span class="tok-key">"ai_alternative_action"</span>: <span class="tok-str">"Proactively suggest TS. Linh (Same Surgical Team)"</span>,
+  <span class="tok-key">"available_slot"</span>: <span class="tok-str">"Tomorrow 08:30 AM"</span>,
+  <span class="tok-key">"patient_abandonment_prevented"</span>: <span class="tok-num">true</span>
+}
+      `;
+    }
+  }
+
+  function showEmergency() {
+    document.getElementById('emergencyView').style.display = 'block';
+    for (let i = 1; i <= 4; i++) {
+      const v = document.getElementById('view-step-' + i);
+      if (v) v.style.display = 'none';
+    }
+    document.getElementById('phoneNavBar').style.display = 'none';
+  }
+
+  function dismissEmergency() {
+    document.getElementById('emergencyView').style.display = 'none';
+    document.getElementById('phoneNavBar').style.display = 'flex';
+    updateStepsUI();
+  }
+
+  function confirmBooking(doc, slot, price) {
+    alert('✅ ĐÃ ĐẶT LỊCH THÀNH CÔNG (Mô phỏng)!\n\n• Bác sĩ: ' + doc + '\n• Thời gian: ' + slot + '\n• Chi phí: ' + price + '\n\nCảm ơn bạn đã trải nghiệm Vinmec SmartMatch AI!');
+  }
+
+  function resetForm() {
+    currentStep = 1;
+    dismissEmergency();
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('btn-sc-gerd');
+    if (btn) btn.classList.add('active');
+    updateStepsUI();
+  }
+
+  // URL Query Parameters support for headless screenshots and demo modes
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('phoneonly') === '1') {
+    const nav = document.querySelector('.workbench-nav');
+    const notebook = document.querySelector('.notebook-col');
+    if (nav) nav.style.display = 'none';
+    if (notebook) notebook.style.display = 'none';
+    document.body.style.padding = '0';
+    document.body.style.background = 'transparent';
+    const container = document.querySelector('.workspace-container');
+    if (container) {
+      container.style.padding = '0';
+      container.style.justifyContent = 'center';
+    }
+  }
+
+  if (urlParams.get('emergency') === '1' || urlParams.get('scenario') === 'emergency') {
+    showEmergency();
+  } else if (urlParams.get('step') === '4' || urlParams.get('scenario')) {
+    const sc = urlParams.get('scenario') || 'gerd';
+    loadScenario(sc);
+  } else {
+    updateStepsUI();
+  }
+</script>
+
+</body>
+</html>

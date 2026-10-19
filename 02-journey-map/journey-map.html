@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Journey map — Đặt lịch & Chọn bác sĩ (Vinmec SmartMatch AI)</title>
+<style>
+  :root{
+    --canvas:#f9f7f3; --surface-bone:#f3f0e8; --surface-card:#ffffff;
+    --surface-dark:#202020; --ink:#202020; --body:#3a3a3a; --charcoal:#575757;
+    --mute:#646464; --ash:#8d8d8d; --hairline:rgba(32,32,32,0.12); --hairline-strong:#202020;
+    --primary-accent:#0b5cab; --primary-light:#eaf4ff;
+    --ok-bg:#e8f6ef; --ok-fg:#1e8e5a; --warn-bg:#fef5e7; --warn-fg:#b9770e;
+    --bad-bg:#fdecea; --bad-fg:#b03a2e;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:"Noto Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--canvas); color:var(--ink); padding:36px 40px 28px; width:1400px;
+  }
+  .kicker{
+    display:inline-block; background:var(--surface-bone); color:var(--ink); font-size:11.5px;
+    font-weight:700; letter-spacing:.8px; border-radius:9999px; padding:4px 12px; margin-bottom:10px;
+    text-transform:uppercase; border:1px solid var(--hairline);
+  }
+  h1{font-size:28px; font-weight:800; letter-spacing:-.6px; line-height:1.2; color:var(--ink);}
+  .sub{color:var(--charcoal); font-size:14px; margin-top:6px; line-height:1.5;}
+  .stages{display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-top:22px;}
+  .stage{
+    background:var(--surface-card); border:1px solid var(--hairline); border-radius:12px;
+    padding:14px 12px; min-height:190px; display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .stage.dip{background:var(--surface-bone); border:1.5px solid var(--bad-fg);}
+  .stage .num{font-size:11px; font-weight:800; color:var(--primary-accent); letter-spacing:.5px; text-transform:uppercase;}
+  .stage.dip .num{color:var(--bad-fg);}
+  .stage h3{font-size:14px; font-weight:700; margin:4px 0 8px; line-height:1.3; color:var(--ink);}
+  .stage ul{list-style:none;}
+  .stage li{font-size:12.5px; color:var(--body); line-height:1.45; margin-bottom:5px; padding-left:12px; position:relative;}
+  .stage li::before{content:""; position:absolute; left:0; top:6px; width:4px; height:4px; border-radius:50%; background:var(--ash);}
+  .tool{
+    display:inline-block; margin-top:8px; font-size:11px; color:var(--charcoal);
+    background:var(--surface-bone); border:1px solid var(--hairline); border-radius:9999px; padding:3px 9px;
+  }
+  .stage.dip .tool{background:var(--bad-bg); color:var(--bad-fg); border-color:transparent;}
+
+  .chart-wrap{margin-top:18px; background:var(--surface-card); border:1px solid var(--hairline); border-radius:14px; padding:12px 10px 6px;}
+  .panels{display:grid; grid-template-columns:1.35fr 1fr; gap:14px; margin-top:16px;}
+  .panel{background:var(--surface-card); border:1px solid var(--hairline); border-radius:14px; padding:16px 18px;}
+  .panel h2{font-size:15px; font-weight:700; margin-bottom:10px; color:var(--ink);}
+  .pain{display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px dashed var(--hairline); font-size:13px; color:var(--body);}
+  .pain:last-child{border-bottom:none;}
+  .pain .id{font-weight:800; color:var(--bad-fg); min-width:26px;}
+  .chip{display:inline-block; font-size:11px; font-weight:700; border-radius:9999px; padding:2px 9px; white-space:nowrap;}
+  .chip.high{background:var(--bad-bg); color:var(--bad-fg);}
+  .chip.mid{background:var(--warn-bg); color:var(--warn-fg);}
+  .chip.low{background:var(--ok-bg); color:var(--ok-fg);}
+  .opp{background:var(--surface-bone); border:1px solid var(--hairline);}
+  .opp li{font-size:13px; color:var(--body); margin:8px 0 8px 18px; line-height:1.5;}
+  .note{font-size:11.5px; color:var(--ash); margin-top:12px;}
+</style>
+</head>
+<body>
+
+<span class="kicker">HÀNH TRÌNH NGƯỜI BỆNH · KHOẢNH KHẮC TIỀN KHÁM</span>
+<h1>Journey map — Khoảnh khắc "Tìm khoa &amp; Chọn bác sĩ" trên MyVinmec</h1>
+<div class="sub">Khoảnh khắc đã chọn: Từ lúc xuất hiện triệu chứng đến khi đặt lịch &amp; vào khám. Đường cảm xúc theo thang 1–5 (1 = bế tắc, lo lắng nhất).</div>
+
+<div class="stages">
+  <div class="stage">
+    <div>
+      <div class="num">GIAI ĐOẠN 1</div><h3>Khởi phát triệu chứng</h3>
+      <ul>
+        <li>Đau nhức khó chịu ("tức ngực", "mỏi vai gáy")</li>
+        <li>Tra cứu Google làm tăng hoang mang</li>
+      </ul>
+    </div>
+    <div><span class="tool">Cơ thể · Internet</span></div>
+  </div>
+  <div class="stage">
+    <div>
+      <div class="num">GIAI ĐOẠN 2</div><h3>Mở app đặt lịch</h3>
+      <ul>
+        <li>Mở app MyVinmec vào form đặt hẹn</li>
+        <li>Bối rối trước danh sách khoa và bác sĩ</li>
+      </ul>
+    </div>
+    <div><span class="tool">App MyVinmec</span></div>
+  </div>
+  <div class="stage dip">
+    <div>
+      <div class="num">GIAI ĐOẠN 3 (ĐÁY)</div><h3>Bế tắc mô tả &amp; Sốc giá</h3>
+      <ul>
+        <li>Không biết dùng thuật ngữ y khoa</li>
+        <li>Mù mờ chuyên môn sâu của từng bác sĩ</li>
+        <li>Sốc giá khám (500k vs 2tr), GS thì kín lịch</li>
+      </ul>
+    </div>
+    <div><span class="tool">Form Đặt hẹn · Danh mục</span></div>
+  </div>
+  <div class="stage">
+    <div>
+      <div class="num">GIAI ĐOẠN 4</div><h3>Đặt liều hoặc gọi viện</h3>
+      <ul>
+        <li>Bấm chọn đại bác sĩ theo linh cảm</li>
+        <li>Hoặc thoát app gọi tổng đài nhờ tư vấn</li>
+      </ul>
+    </div>
+    <div><span class="tool">Tổng đài · App</span></div>
+  </div>
+  <div class="stage">
+    <div>
+      <div class="num">GIAI ĐOẠN 5</div><h3>Khám &amp; Rủi ro nhầm khoa</h3>
+      <ul>
+        <li>Đến viện, vào gặp bác sĩ</li>
+        <li>Rủi ro bị chuyển khoa, tốn tiền khám lần 2</li>
+      </ul>
+    </div>
+    <div><span class="tool">Phòng khám · Quầy thu ngân</span></div>
+  </div>
+  <div class="stage">
+    <div>
+      <div class="num">GIAI ĐOẠN 6</div><h3>Hoàn tất &amp; Điều trị</h3>
+      <ul>
+        <li>Nhận chẩn đoán, mua thuốc/điều trị</li>
+        <li>Nhẹ nhõm nhưng mệt mỏi vì chi phí phát sinh</li>
+      </ul>
+    </div>
+    <div><span class="tool">Bác sĩ · Nhà thuốc</span></div>
+  </div>
+</div>
+
+<div class="chart-wrap">
+<svg viewBox="0 0 1320 236" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans, -apple-system, sans-serif">
+  <!-- gridlines -->
+  <g stroke="rgba(32,32,32,0.06)" stroke-width="1">
+    <line x1="60" y1="30" x2="1300" y2="30"/><line x1="60" y1="65" x2="1300" y2="65"/>
+    <line x1="60" y1="100" x2="1300" y2="100"/><line x1="60" y1="135" x2="1300" y2="135"/>
+    <line x1="60" y1="170" x2="1300" y2="170"/>
+  </g>
+  <g fill="#8d8d8d" font-size="12" text-anchor="end" font-weight="600">
+    <text x="50" y="34">5</text><text x="50" y="69">4</text><text x="50" y="104">3</text>
+    <text x="50" y="139">2</text><text x="50" y="174">1</text>
+  </g>
+  <!-- area + curve: scores 2.5 (117.5), 2.0 (135), 1.0 (170), 2.0 (135), 1.8 (142), 4.0 (65) -->
+  <path d="M110,117.5 L330,135 L550,170 L770,135 L990,142 L1210,65 L1210,196 L110,196 Z" fill="rgba(32,32,32,.04)"/>
+  <polyline points="110,117.5 330,135 550,170 770,135 990,142 1210,65" fill="none" stroke="#202020" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- dots: pain stages highlighted -->
+  <circle cx="110" cy="117.5" r="6" fill="#fff" stroke="#202020" stroke-width="2.5"/>
+  <circle cx="330" cy="135" r="6" fill="#fff" stroke="#202020" stroke-width="2.5"/>
+  <circle cx="550" cy="170" r="8" fill="#fdecea" stroke="#b03a2e" stroke-width="3"/>
+  <circle cx="770" cy="135" r="6" fill="#fff" stroke="#202020" stroke-width="2.5"/>
+  <circle cx="990" cy="142" r="7" fill="#fdecea" stroke="#b03a2e" stroke-width="2.5"/>
+  <circle cx="1210" cy="65" r="6" fill="#fff" stroke="#1e8e5a" stroke-width="2.5"/>
+  <!-- annotations -->
+  <g font-size="12" fill="#575757" text-anchor="middle" font-weight="600">
+    <text x="110" y="214">2.5 · lo âu</text>
+    <text x="330" y="214">2.0 · bỡ ngỡ</text>
+    <text x="550" y="214" font-weight="800" fill="#b03a2e">1.0 · bế tắc nhất (Đáy)</text>
+    <text x="770" y="214">2.0 · bất an</text>
+    <text x="990" y="214">1.8 · lo chi phí kép</text>
+    <text x="1210" y="214">4.0 · nhẹ nhõm</text>
+  </g>
+  <g>
+    <line x1="550" y1="150" x2="550" y2="108" stroke="#b03a2e" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="562" y="98" font-size="12.5" font-weight="700" fill="#b03a2e">Đáy cảm xúc: Bế tắc diễn đạt triệu chứng &amp; hoang mang chi phí khám</text>
+  </g>
+  <!-- opportunity bracket over stages 2-3 -->
+  <g>
+    <rect x="250" y="8" width="480" height="22" rx="11" fill="#f3f0e8" stroke="rgba(32,32,32,0.15)"/>
+    <text x="490" y="23.5" font-size="12" font-weight="800" fill="#202020" text-anchor="middle" letter-spacing=".4px">CƠ HỘI: Vinmec SmartMatch AI đặt tại giai đoạn 2–3</text>
+  </g>
+</svg>
+</div>
+
+<div class="panels">
+  <div class="panel">
+    <h2>Điểm đau (gắn với giai đoạn)</h2>
+    <div class="pain"><span class="id">D1</span><div>Rào cản diễn đạt: không biết dùng từ ngữ y khoa, sợ mô tả sai <span class="chip high">Cao</span> — GĐ 2–3</div></div>
+    <div class="pain"><span class="id">D2</span><div>Mù mờ chuyên môn sâu của từng bác sĩ, chỉ thấy học hàm chung chung <span class="chip high">Cao</span> — GĐ 3</div></div>
+    <div class="pain"><span class="id">D3</span><div>Bất an chi phí: phân tầng giá lớn (500k vs 2tr), sợ tốn kém vô ích <span class="chip high">Cao nhất</span> — GĐ 3</div></div>
+    <div class="pain"><span class="id">D4</span><div>Ngõ cụt khi chuyên gia kín lịch (như GS. Dũng hết slot), app không gợi ý <span class="chip mid">TB</span> — GĐ 3–4</div></div>
+    <div class="pain"><span class="id">D5</span><div>Rủi ro khám nhầm chuyên khoa, mất tiền khám lần 2 và chờ lại từ đầu <span class="chip high">Cao nhất</span> — GĐ 5</div></div>
+  </div>
+  <div class="panel opp">
+    <h2>Cơ hội thiết kế (SmartMatch AI)</h2>
+    <ul>
+      <li><strong>Guided Intake:</strong> Bản đồ cơ thể (Body Map) + Từ điển cảm giác đời thường khơi mở nỗi đau.</li>
+      <li><strong>Tối ưu kinh phí &amp; Minh bạch:</strong> Đề xuất bác sĩ theo cấp bậc &amp; tích hợp bảo hiểm y tế/tư nhân.</li>
+      <li><strong>Cân bằng tải thông minh:</strong> Khớp chuyên môn sâu với ca bệnh, tránh dồn ứ chuyên gia đầu ngành.</li>
+      <li><strong>Bộ lọc cờ đỏ cấp cứu:</strong> Chặn luồng đặt hẹn thường và kích hoạt cấp cứu 115 khi có triệu chứng nguy kịch.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="note">Nguồn dữ liệu: Kiểm thử thực tế app MyVinmec (18/10/2026, Xiaomi 14) + 3 cuộc phỏng vấn chuyên sâu (P1, P2, P3).</div>
+
+</body>
+</html>

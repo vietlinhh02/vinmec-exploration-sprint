@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Slides — Vinmec SmartMatch AI (Exploration Sprint)</title>
+<!-- GOOGLE FONTS: BRICOLAGE GROTESQUE + INTER + JETBRAINS MONO -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- PHOSPHOR ICONS -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+  :root {
+    --canvas: #f9f7f3;
+    --surface-bone: #f3f0e8;
+    --surface-card: #ffffff;
+    --surface-dark: #202020;
+    --surface-deep: #000000;
+    --ink: #202020;
+    --body: #3a3a3a;
+    --charcoal: #575757;
+    --ash: #8d8d8d;
+    --hairline: rgba(32, 32, 32, 0.12);
+    --hairline-strong: #202020;
+    --primary: #0b5cab;
+    --primary-deep: #004880;
+    --primary-light: #eaf4ff;
+    --accent-warm: #c59b27;
+    --badge-success: #2b9a66;
+    --badge-success-light: #e8f6ef;
+    --badge-alert: #b03a2e;
+    --badge-alert-light: #fdecea;
+  }
+
+  @page { size: 1280px 720px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink); background: #18181b;
+  }
+
+  .slide {
+    width: 1280px; height: 720px; background: var(--canvas); padding: 40px 60px 38px;
+    position: relative; overflow: hidden; page-break-after: always; margin: 0 auto;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .slide:last-child { page-break-after: auto; }
+  @media screen {
+    .slide { margin: 20px auto; box-shadow: 0 16px 48px rgba(0,0,0,0.4); border-radius: 4px; }
+    body { padding: 8px 0; }
+  }
+
+  /* EDITORIAL KICKER PILL */
+  .kicker {
+    display: inline-flex; align-items: center; gap: 7px; background: var(--surface-bone);
+    color: var(--ink); font-family: "JetBrains Mono", monospace; font-size: 11px;
+    font-weight: 700; letter-spacing: 0.8px; border-radius: 9999px; padding: 4px 13px;
+    margin-bottom: 10px; text-transform: uppercase; border: 1px solid rgba(32,32,32,0.14);
+    align-self: flex-start;
+  }
+  .kicker i { font-size: 14px; color: var(--primary); }
+
+  /* DISPLAY TYPOGRAPHY */
+  h1 {
+    font-family: "Bricolage Grotesque", -apple-system, sans-serif;
+    font-size: 42px; line-height: 1.05; letter-spacing: -1.8px; font-weight: 800; color: var(--ink);
+  }
+  h2 {
+    font-family: "Bricolage Grotesque", -apple-system, sans-serif;
+    font-size: 30px; line-height: 1.1; letter-spacing: -1px; font-weight: 800; color: var(--ink);
+    margin-bottom: 8px;
+  }
+  h3 {
+    font-family: "Bricolage Grotesque", -apple-system, sans-serif;
+    font-size: 15px; line-height: 1.25; letter-spacing: -0.4px; font-weight: 700; color: var(--ink);
+  }
+  p.lead {
+    font-size: 15px; color: var(--body); line-height: 1.5; font-weight: 400;
+  }
+
+  /* BULLETS */
+  ul.bullets { margin: 6px 0 0 0; list-style: none; }
+  ul.bullets li {
+    font-size: 13.5px; color: var(--body); line-height: 1.45; margin: 4px 0;
+    padding-left: 20px; position: relative;
+  }
+  ul.bullets li::before {
+    content: ""; position: absolute; left: 2px; top: 7px; width: 6px; height: 6px;
+    border-radius: 2px; background: var(--ink);
+  }
+
+  /* GRIDS & CARDS */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  
+  .card {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 14px 16px; position: relative;
+  }
+  .card.bone { background: var(--surface-bone); }
+  .card.dark {
+    background: var(--surface-dark); color: #fcfcfc; border-color: var(--surface-dark);
+  }
+  .card.dark h3 { color: #fcfcfc; }
+  .card.dark p { color: rgba(252,252,252,0.85); }
+
+  .card-badge {
+    position: absolute; top: 12px; right: 14px; font-family: "JetBrains Mono", monospace;
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 9999px;
+    background: var(--surface-bone); color: var(--charcoal); border: 1px solid var(--hairline);
+  }
+  .card.dark .card-badge {
+    background: rgba(255,255,255,0.12); color: #fcfcfc; border-color: rgba(255,255,255,0.2);
+  }
+
+  /* STAT CARDS ON COVER */
+  .stat-card {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .stat-num {
+    font-family: "Bricolage Grotesque", sans-serif; font-size: 28px; font-weight: 800;
+    color: var(--primary); line-height: 1; letter-spacing: -1px;
+  }
+  .stat-label { font-size: 12px; font-weight: 700; color: var(--ink); }
+  .stat-desc { font-size: 11px; color: var(--charcoal); line-height: 1.35; }
+
+  /* FLOW COMPARISON BARS */
+  .flow-track {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 10px;
+    padding: 10px 14px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .flow-title {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 6px;
+  }
+  .flow-steps {
+    display: flex; gap: 8px; align-items: center; font-size: 11.5px;
+  }
+  .flow-step-node {
+    background: var(--surface-bone); border: 1px solid var(--hairline); border-radius: 6px;
+    padding: 6px 10px; font-weight: 600; color: var(--body); flex: 1; text-align: center;
+  }
+  .flow-step-node.bad { background: #fdecea; color: #b03a2e; border-color: rgba(176,58,46,0.2); }
+  .flow-step-node.good { background: #e8f6ef; color: #1e8e5a; border-color: rgba(43,154,102,0.2); }
+  .flow-arrow { color: var(--ash); font-weight: 800; font-size: 12px; }
+
+  /* EDITORIAL QUOTE CARDS */
+  .quote-card {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-left: 4px solid var(--ink);
+    border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px;
+  }
+  .quote-header {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px; font-weight: 700;
+    color: var(--charcoal); text-transform: uppercase;
+  }
+  .quote-body {
+    font-size: 12.5px; color: var(--body); line-height: 1.45; font-style: italic;
+  }
+
+  /* CALLOUT BANNER */
+  .callout {
+    background: var(--surface-bone); border: 1px solid rgba(32,32,32,0.15); border-radius: 10px;
+    padding: 10px 16px; font-size: 12.5px; color: var(--ink); line-height: 1.45; font-weight: 500;
+  }
+  .callout b { color: var(--ink); font-weight: 800; }
+
+  /* BIG QUOTE (NEED STATEMENT) */
+  .bigq {
+    background: var(--surface-card); border: 1.5px solid var(--hairline-strong); border-radius: 14px;
+    padding: 16px 22px; font-size: 15.5px; line-height: 1.5; color: var(--ink);
+  }
+  .bigq b {
+    color: var(--ink); background: rgba(32,32,32,0.06); padding: 1px 5px; border-radius: 4px;
+  }
+
+  /* PILLS & CHIPS */
+  .chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .chip {
+    background: var(--surface-bone); color: var(--ink); font-size: 11.5px; font-weight: 600;
+    border-radius: 9999px; padding: 5px 12px; border: 1px solid var(--hairline);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .chip.g { background: var(--badge-success-light); color: var(--badge-success); border-color: transparent; }
+  .chip.w { background: #fef5e7; color: #b9770e; border-color: transparent; }
+  .chip.r { background: var(--badge-alert-light); color: var(--badge-alert); border-color: transparent; }
+  .chip.b { background: var(--primary-light); color: var(--primary); border-color: transparent; }
+
+  /* COMPARISON TABLE MATRIX */
+  .matrix-table {
+    width: 100%; border-collapse: collapse; font-size: 11.5px; background: var(--surface-card);
+    border-radius: 10px; overflow: hidden; border: 1px solid var(--hairline);
+  }
+  .matrix-table th {
+    background: var(--surface-bone); padding: 7px 10px; text-align: left; font-weight: 700;
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--charcoal);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .matrix-table td {
+    padding: 7px 10px; border-bottom: 1px solid rgba(32,32,32,0.06); color: var(--body);
+    vertical-align: middle;
+  }
+  .matrix-table tr:last-child td { border-bottom: none; }
+  .matrix-table tr.highlight td { background: #f0f7ff; font-weight: 600; color: var(--primary-deep); }
+
+  /* TIMELINE */
+  .tl { display: flex; gap: 8px; margin-top: 8px; }
+  .tl .step {
+    flex: 1; background: var(--surface-card); border: 1px solid var(--hairline);
+    border-radius: 8px; padding: 8px 10px; font-size: 11px; line-height: 1.35; color: var(--body);
+  }
+  .tl .step b {
+    display: block; color: var(--ink); font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px; margin-bottom: 3px; font-weight: 800;
+  }
+
+  /* META PILLS ON COVER */
+  .meta-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .meta-row span {
+    background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 9999px;
+    font-size: 12px; font-weight: 600; padding: 5px 12px; color: var(--ink);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .meta-row span i { color: var(--primary); }
+
+  /* FOOTER */
+  .footer {
+    display: flex; justify-content: space-between; font-size: 11px; color: var(--ash);
+    border-top: 1px solid var(--hairline); padding-top: 8px; font-weight: 500;
+  }
+  .footer-page { font-family: "JetBrains Mono", monospace; font-weight: 700; color: var(--ink); }
+
+  /* MONO TAG */
+  .mono-tag {
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px; background: rgba(32,32,32,0.06);
+    padding: 2px 6px; border-radius: 4px; font-weight: 600; color: var(--ink);
+  }
+  .src {
+    display: block; margin-top: 6px; font-size: 10.5px; color: var(--ash);
+    font-family: "JetBrains Mono", monospace; word-break: break-all;
+  }
+
+  /* DEVICE MOCKUP FRAME */
+  .device-mockup {
+    height: 380px; width: auto; border-radius: 14px; border: 1px solid var(--hairline);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08); background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: COVER -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-first-aid"></i> VINMEC EXPLORATION SPRINT · BÀI TẬP 1 TUẦN</span>
+    <h1>Một lần đi khám:<br>Chọn đúng bác sĩ từ <span style="text-decoration:underline; text-decoration-color:var(--ink); text-underline-offset:6px;">triệu chứng đời thường</span></h1>
+    <p class="lead" style="margin-top:12px; max-width:960px;">
+      Bệnh nhân thường không biết dùng từ y khoa để đặt lịch. Khi app bắt tự chọn giữa 20 chuyên khoa và bảng giá từ 500 nghìn đến 2 triệu, họ dễ chọn nhầm và mất tiền khám hai lần. <b>Vinmec SmartMatch AI</b> giải quyết rào cản này: hỏi triệu chứng bình dân, gợi ý 2–3 bác sĩ đúng chuyên môn và túi tiền, đồng thời chặn ngay các dấu hiệu cấp cứu.
+    </p>
+    <div class="meta-row">
+      <span><i class="ph-bold ph-user"></i> Nguyễn Viết Linh · Khóa K2</span>
+      <span><i class="ph-bold ph-calendar-blank"></i> Nộp ngày: 19/10/2026</span>
+      <span><i class="ph-bold ph-stethoscope"></i> Chủ đề: Tiền khám &amp; Chọn bác sĩ</span>
+      <span><i class="ph-bold ph-sparkle"></i> Đề tài: Vinmec SmartMatch AI</span>
+    </div>
+  </div>
+
+  <!-- STATS GRID FILLING BOTTOM HALF -->
+  <div class="grid4" style="margin-top:14px;">
+    <div class="stat-card">
+      <div class="stat-num">Trực tiếp</div>
+      <div class="stat-label">Trải nghiệm ứng dụng thật</div>
+      <div class="stat-desc">Tác giả trực tiếp dùng app MyVinmec đóng vai người bệnh để ghi nhận từng điểm bế tắc.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">03</div>
+      <div class="stat-label">Phỏng vấn sâu người thật</div>
+      <div class="stat-desc">3 bệnh nhân thật chia sẻ về sự cố khám nhầm khoa, sốc giá và bế tắc khi miêu tả bệnh.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">1.2 Tr</div>
+      <div class="stat-label">Tiết kiệm dự kiến / ca</div>
+      <div class="stat-desc">Tránh làm xét nghiệm cận lâm sàng trùng lặp khi người bệnh được chỉ đúng chuyên khoa.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Chặn ca cấp cứu</div>
+      <div class="stat-desc">Khóa ngay quy trình đặt hẹn thường để gọi thẳng 115 khi phát hiện dấu hiệu nguy kịch.</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">01 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 2: KHOẢNH KHẮC & VÌ SAO CHỌN -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-target"></i> KHOẢNH KHẮC ĐÃ CHỌN</span>
+    <h2>Bước chọn bác sĩ: Nơi người bệnh dễ chọn nhầm nhất</h2>
+    <div class="grid2" style="margin-top:10px;">
+      <div class="card bone">
+        <span class="card-badge">RÀO CẢN 01</span>
+        <h3>1. Người bệnh chỉ có cảm giác, không có từ y khoa</h3>
+        <p style="margin-top:4px; font-size:13px; line-height:1.45;">Họ chỉ biết mình bị "nhói ngực", "nóng rát", hay "tê buốt cánh tay". Tra Google thì hoang mang, còn mở app thì thấy danh sách hơn 20 chuyên khoa với toàn từ chuyên môn xa lạ.</p>
+      </div>
+      <div class="card bone">
+        <span class="card-badge">TỔN THẤT 02</span>
+        <h3>2. Chọn nhầm khoa kéo theo mất tiền và mất thời gian</h3>
+        <p style="margin-top:4px; font-size:13px; line-height:1.45;">Đau tức ngực do trào ngược dạ dày nhưng đặt nhầm Tim mạch. Sau khi làm xét nghiệm 2,5 triệu ra kết quả bình thường, bác sĩ lại chuyển sang Tiêu hóa để đóng tiền khám từ đầu.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOWCHART COMPARISON FILLING LOWER HALF -->
+  <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+    <div class="flow-track">
+      <div class="flow-title" style="color:var(--badge-alert);"><i class="ph-bold ph-x-circle"></i> THỰC TẾ HIỆN NAY (STATUS QUO)</div>
+      <div class="flow-steps">
+        <div class="flow-step-node bad">Thấy tức ngực sau bữa ăn</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step-node bad">Tra Google sợ bệnh tim</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step-node bad">Mò mẫm tự đặt Tim mạch</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step-node bad">Tốn 2,5tr xét nghiệm âm tính</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step-node bad">Chuyển Tiêu hóa khám lại lần 2</div>
+      </div>
+    </div>
+
+    <div class="flow-track">
+      <div class="flow-title" style="color:var(--badge-success);"><i class="ph-bold ph-check-circle"></i> HƯỚNG TIẾP CẬN VỚI SMARTMATCH AI</div>
+      <div class="flow-steps">
+        <div class="flow-step-node good">Kể cảm giác bằng lời tự nhiên</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step-node good">Chạm vùng đau trên Body Map</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step-node good">Phân luồng đúng Tiêu hóa</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step-node good">Gợi ý BS tiêu chuẩn (550k)</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step-node good">Khám đúng ngay lần 1, không tốn oan</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:6px;">
+    Nếu người bệnh chọn nhầm chuyên khoa ngay từ bước đặt lịch, họ sẽ mất cả buổi sáng ở viện và tốn thêm tiền cho những xét nghiệm không cần thiết.
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">02 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 3: TRẢI NGHIỆM THỰC TẾ APP MYVINMEC -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-device-mobile"></i> TRẢI NGHIỆM TRÊN APP THẬT</span>
+    <h2>Thực tế trên app MyVinmec: Chia slot kỹ, nhưng thiếu người dẫn đường</h2>
+  </div>
+
+  <!-- EVIDENCE LAYOUT: REAL SCREENSHOTS ON LEFT, INSIGHTS ON RIGHT -->
+  <div style="display:flex; gap:20px; align-items:center; margin-top:4px;">
+    <div style="display:flex; gap:12px; flex-shrink:0;">
+      <div style="text-align:center;">
+        <img src="01-phong-van/adb-evidence/app-specialties.png" alt="Chuyên khoa" class="device-mockup">
+        <span style="font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--charcoal); display:block; margin-top:4px;">Giao diện thực tế: Danh sách 20+ chuyên khoa</span>
+      </div>
+      <div style="text-align:center;">
+        <img src="01-phong-van/adb-evidence/app-slots.png" alt="Lịch hẹn" class="device-mockup">
+        <span style="font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--charcoal); display:block; margin-top:4px;">Giao diện thực tế: Khung giờ chia slot 30 phút</span>
+      </div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+      <div class="card bone">
+        <span class="card-badge">TRẢI NGHIỆM THỰC TẾ</span>
+        <h3>1. Bắt người dùng tự đoán chuyên khoa</h3>
+        <p style="margin-top:4px; font-size:12.5px; line-height:1.45;">App chia giờ khám 30 phút (<span class="mono-tag">07:30</span>, <span class="mono-tag">08:00</span>...) rất chi tiết. Nhưng để đặt được lịch, bệnh nhân phải tự chọn trong hơn 20 chuyên khoa sâu (tuyến giáp, di truyền y học, hen dị ứng...). Người không có chuyên môn y khoa không thể biết đau tức ngực nên vào đâu.</p>
+      </div>
+
+      <div class="card bone">
+        <span class="card-badge">HẾT CHỖ LÀ DỪNG</span>
+        <h3>2. Hết lịch hẹn là dừng luồng, không có phương án phụ</h3>
+        <p style="margin-top:4px; font-size:12.5px; line-height:1.45;">Khi chọn GS. Trần Trung Dũng ngày 19/10, app chỉ hiện dòng chữ đỏ <i>"Hiện tại không có lịch trống"</i> rồi dừng lại. App không gợi ý bác sĩ cùng chuyên môn trong kíp mổ, cũng không hiển thị mức giá khám để người bệnh cân nhắc.</p>
+      </div>
+
+      <div class="callout" style="font-size:12px;">
+        <i class="ph-bold ph-lightbulb" style="color:var(--primary);"></i> Trải nghiệm thực tế của người dùng cho thấy vấn đề không nằm ở hệ thống chia giờ, mà ở chỗ app thiếu bước tiếp đón ban đầu để hiểu người bệnh cần gì.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">03 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 4: PHỎNG VẤN 3 NGƯỜI DÙNG SÂU -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-chats-circle"></i> NGHIÊN CỨU NGƯỜI DÙNG</span>
+    <h2>Tiếng nói người bệnh: Mù mờ chuyên môn, sợ tốn tiền và bế tắc từ ngữ</h2>
+    <div class="grid3" style="margin-top:10px;">
+      <div class="quote-card">
+        <div class="quote-header">
+          <span><i class="ph-bold ph-user-circle"></i> P1 · 32 tuổi</span>
+          <span>Khám nhầm khoa</span>
+        </div>
+        <div class="quote-body">
+          "Tôi đọc mạng thấy sợ bệnh tim nên đặt khám tim, mất hơn 2 triệu tiền xét nghiệm rồi bác sĩ bảo sang tiêu hóa. Vừa tốn tiền vừa bực mình."
+        </div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-header">
+          <span><i class="ph-bold ph-user-circle"></i> P2 · 44 tuổi</span>
+          <span>Đặt lịch hộ mẹ</span>
+        </div>
+        <div class="quote-body">
+          "Mẹ tôi bị tê tay, đánh rơi cả đũa. Mở app thấy toàn Giáo sư với Tiến sĩ nhưng chịu không biết ai chuyên về cổ, ai chuyên về khớp gối để mà chọn."
+        </div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-header">
+          <span><i class="ph-bold ph-user-circle"></i> P3 · 28 tuổi</span>
+          <span>Chấn thương thể thao</span>
+        </div>
+        <div class="quote-body">
+          "Thấy thầy Dũng nổi tiếng nên tôi bấm đặt, hết chỗ là app đứng im luôn. Thật ra ca nhẹ như tôi chỉ cần bác sĩ trẻ khám cũng được, đỡ tốn tiền triệu."
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY MATRIX FILLING BOTTOM HALF -->
+  <table class="matrix-table" style="margin-top:10px;">
+    <thead>
+      <tr>
+        <th style="width:18%;">Người tham gia</th>
+        <th style="width:28%;">Tình huống khi mở app</th>
+        <th style="width:28%;">Điểm ức chế nhất</th>
+        <th style="width:26%;">Kỳ vọng thực tế vào AI</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>P1 (Trào ngược dạ dày)</b></td>
+        <td>Đoán mò rồi tự đặt nhầm chuyên khoa Tim mạch</td>
+        <td>Mất 2,5 triệu làm xét nghiệm cận lâm sàng không cần thiết</td>
+        <td>Nhận diện triệu chứng "ợ chua sau ăn" để chỉ sang Tiêu hóa</td>
+      </tr>
+      <tr>
+        <td><b>P2 (Đặt lịch hộ mẹ)</b></td>
+        <td>Mẹ bị thoái hóa cổ, app chỉ hiện học hàm chung</td>
+        <td>Không rõ bác sĩ nào chuyên sâu về cổ, sợ chọn nhầm làm mẹ đau</td>
+        <td>Giải thích rõ thế mạnh thực tế của từng bác sĩ</td>
+      </tr>
+      <tr>
+        <td><b>P3 (Chấn thương nhẹ)</b></td>
+        <td>Cố đặt Giáo sư đầu ngành nhưng hết chỗ</td>
+        <td>Bị dừng luồng; không muốn tốn 2 triệu cho ca bệnh nhẹ</td>
+        <td>Gợi ý bác sĩ cùng kíp mổ kèm mức phí vừa phải (550k)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">04 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 5: JOURNEY MAP & ĐIỂM ĐAU -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-chart-line-up"></i> JOURNEY MAP &amp; INSIGHT</span>
+    <h2>Hành trình khám: Căng thẳng nhất lúc chọn khoa và chọn bác sĩ</h2>
+  </div>
+
+  <div style="display:flex; gap:18px; align-items:center; margin-top:4px;">
+    <img src="02-journey-map/journey-map.png" alt="Journey map" style="width:710px; height:auto; border-radius:12px; border:1px solid var(--hairline);">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+      <div class="card" style="border-left: 4px solid var(--badge-alert);">
+        <span class="card-badge" style="color:var(--badge-alert);">ĐÁY 1.0</span>
+        <h3>Đáy cảm xúc (Điểm 1.0)</h3>
+        <p style="margin-top:3px; font-size:12.5px; line-height:1.4;">Giai đoạn 3: Bế tắc khi mô tả triệu chứng, lo lắng vì mức chênh lệch giá lớn (500k vs 2tr), và bị dừng luồng khi bác sĩ kín lịch.</p>
+      </div>
+      <div class="card bone">
+        <h3>Vị trí can thiệp của AI</h3>
+        <p style="margin-top:3px; font-size:12.5px; line-height:1.4;">Đặt trợ lý ngay trước form đặt hẹn: Dùng sơ đồ cơ thể khơi mở triệu chứng, lọc theo 3 mức giá và chặn dấu hiệu nguy cấp.</p>
+      </div>
+      <div class="card">
+        <h3>5 Điểm nghẽn từ phỏng vấn</h3>
+        <p style="margin-top:3px; font-size:12px; line-height:1.4;">Không biết dùng từ y khoa · Mù mờ chuyên môn · Bất an về viện phí · Hết chỗ không có phương án phụ · Khám nhầm chuyên khoa.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">05 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 6: NEED STATEMENT (BIODESIGN) -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-lightbulb"></i> NEED STATEMENT · STANFORD BIODESIGN</span>
+    <h2>Tập trung vào vấn đề cốt lõi, không đưa trước giải pháp kỹ thuật</h2>
+  </div>
+
+  <div class="bigq" style="margin-top:4px;">
+    Cách để giúp <b>người bệnh ngoại trú có nhu cầu thăm khám nhưng chưa rõ bệnh lý chính xác</b> — gặp khó khăn trong việc tự diễn đạt triệu chứng và thiếu thông tin minh bạch về chuyên môn sâu cũng như chi phí khám — <b>tìm được đúng bác sĩ phù hợp nhất với tình trạng sức khỏe, khả năng tài chính và thời gian của mình</b>, qua đó giảm thiểu nguy cơ khám sai chuyên khoa, tối ưu hóa chi phí điều trị và cân bằng tải lịch làm việc cho đội ngũ y bác sĩ.
+  </div>
+
+  <!-- 3 STANFORD BIODESIGN PILLARS IN DETAIL -->
+  <div class="grid3" style="margin-top:8px;">
+    <div class="card bone">
+      <span class="chip b" style="margin-bottom:6px;"><i class="ph-bold ph-users"></i> ĐỐI TƯỢNG (POPULATION)</span>
+      <h3 style="font-size:13.5px;">Bệnh nhân ngoại trú &amp; Người đặt hộ</h3>
+      <p style="font-size:11.5px; line-height:1.4; margin-top:3px;">Người có triệu chứng bất thường nhưng chưa từng đi khám; không rành thuật ngữ y khoa trên ứng dụng.</p>
+    </div>
+    <div class="card bone">
+      <span class="chip w" style="margin-bottom:6px;"><i class="ph-bold ph-warning"></i> KHÓ KHĂN (PROBLEM)</span>
+      <h3 style="font-size:13.5px;">Bế tắc từ ngữ &amp; Mù mờ chuyên môn</h3>
+      <p style="font-size:11.5px; line-height:1.4; margin-top:3px;">Không biết gọi tên triệu chứng; sợ đặt nhầm khoa tốn tiền vô ích; hoang mang trước bảng giá chênh lệch lớn.</p>
+    </div>
+    <div class="card bone">
+      <span class="chip g" style="margin-bottom:6px;"><i class="ph-bold ph-check-circle"></i> KẾT QUẢ ĐO ĐƯỢC (OUTCOME)</span>
+      <h3 style="font-size:13.5px;">Đúng bác sĩ &amp; Rõ ràng chi phí</h3>
+      <p style="font-size:11.5px; line-height:1.4; margin-top:3px;">Khám đúng khoa ngay lần 1, tiết kiệm 65% chi phí cho ca nhẹ, và giãn tải lịch hẹn cho các bác sĩ đầu ngành.</p>
+    </div>
+  </div>
+
+  <div class="callout" style="font-size:11.5px; margin-top:6px;">
+    <b>Ranh giới cần giữ:</b> Không chẩn đoán bệnh thay bác sĩ, không thay thế cấp cứu, không ép người bệnh chọn theo gợi ý, và không thiên vị thương mại để ép gói giá cao.
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">06 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 7: 3 BEST PRACTICE QUỐC TẾ -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-globe"></i> KINH NGHIỆM QUỐC TẾ</span>
+    <h2>Học hỏi từ ba mô hình chăm sóc sức khỏe đã được kiểm chứng</h2>
+    <div class="grid3" style="margin-top:8px;">
+      <div class="card bone">
+        <span class="card-badge">ĐỨC / TOÀN CẦU</span>
+        <h3>Ada Health</h3>
+        <p style="margin-top:4px; font-size:12px; line-height:1.45;">Dùng sơ đồ cơ thể và câu hỏi đời thường ("nhói", "râm ran") để người bệnh chỉ chỗ đau. Kiểm tra dấu hiệu nguy cấp trước tiên.</p>
+        <span class="src">ada.com/science-clinical-evidence</span>
+      </div>
+      <div class="card bone">
+        <span class="card-badge">HOA KỲ</span>
+        <h3>Zocdoc Care Matching</h3>
+        <p style="margin-top:4px; font-size:12px; line-height:1.45;">Ghép bệnh nhân theo thế mạnh chuyên môn sâu của bác sĩ và công khai giá theo phân tầng, giúp giãn tải lịch khám tự động.</p>
+        <span class="src">hbr.org · modernhealthcare.com</span>
+      </div>
+      <div class="card bone">
+        <span class="card-badge">ANH &amp; MỸ</span>
+        <h3>Mayo Clinic &amp; NHS 111</h3>
+        <p style="margin-top:4px; font-size:12px; line-height:1.45;">Giữ nguyên tắc phân luồng chứ không chẩn đoán. Khi phát hiện dấu hiệu nguy cấp, chuyển thẳng cuộc gọi sang tổng đài cấp cứu.</p>
+        <span class="src">digital.nhs.uk/nhs-111 · mayoclinic.org</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BENCHMARK SYNTHESIS MATRIX FILLING LOWER HALF -->
+  <table class="matrix-table" style="margin-top:8px;">
+    <thead>
+      <tr>
+        <th style="width:22%;">Nội dung so sánh</th>
+        <th style="width:20%;">Ada Health (AI Symptom)</th>
+        <th style="width:20%;">Zocdoc (Care Matching)</th>
+        <th style="width:20%;">NHS 111 (Clinical Triage)</th>
+        <th style="width:18%;">Vinmec SmartMatch AI</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>Cách hỏi triệu chứng</b></td>
+        <td>Sơ đồ cơ thể + câu hỏi dẫn dắt</td>
+        <td>Ô tìm kiếm từ khóa thông thường</td>
+        <td>Cây quyết định của điều dưỡng</td>
+        <td><b>Sơ đồ cơ thể + Nhập tiếng Việt tự nhiên</b></td>
+      </tr>
+      <tr>
+        <td><b>Khớp chuyên môn bác sĩ</b></td>
+        <td>Gợi ý mã bệnh ICD-10</td>
+        <td>Khớp theo khoa và hồ sơ bác sĩ</td>
+        <td>Chuyển tuyến bệnh viện công</td>
+        <td><b>Khớp theo kíp mổ và thế mạnh ca bệnh</b></td>
+      </tr>
+      <tr>
+        <td><b>Minh bạch giá khám</b></td>
+        <td>Không hỗ trợ</td>
+        <td>Theo bảo hiểm tư nhân Mỹ</td>
+        <td>Miễn phí dịch vụ y tế công</td>
+        <td><b>3 Phân tầng: Tiêu chuẩn - Chuyên gia</b></td>
+      </tr>
+      <tr class="highlight">
+        <td><b>Xử lý ca cấp cứu</b></td>
+        <td>Cảnh báo khẩn cấp</td>
+        <td>Không hỗ trợ lọc cấp cứu</td>
+        <td>Chuyển line cấp cứu 999</td>
+        <td><b>Khóa đặt lịch thường &rarr; Gọi 115 Vinmec</b></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="margin-top:6px; font-size:11.5px;">
+    Kinh nghiệm rút ra: Dùng ngôn ngữ đời thường để người bệnh dễ nói, công khai giá rõ ràng, và luôn có chốt chặn cấp cứu an toàn.
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">07 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 8: PROTOTYPE VINMEC SMARTMATCH AI -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-cpu"></i> BẢN DỰNG THỰC TẾ</span>
+    <h2>Mô phỏng trải nghiệm chọn bác sĩ thông minh</h2>
+  </div>
+
+  <div style="display:flex; gap:16px; align-items:stretch; margin-top:2px;">
+    <img src="05-prototype/screenshot-main.png" alt="SmartMatch Results" style="height:465px; width:auto; border-radius:18px; border:1px solid rgba(32,32,32,0.14);">
+    <img src="05-prototype/screenshot-alert.png" alt="Emergency Alert" style="height:465px; width:auto; border-radius:18px; border:1px solid rgba(32,32,32,0.14);">
+    <div class="card" style="flex:1; padding:14px 16px; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <h3 style="margin-bottom:6px; font-size:15px;"><i class="ph-bold ph-check-square"></i> 5 Điểm mấu chốt được đưa vào prototype</h3>
+        <ul class="bullets" style="margin-top:2px;">
+          <li style="font-size:12.5px;"><b>Sơ đồ cơ thể trực quan:</b> Bấm chọn vùng ngực, chọn "đau tức" hoặc "ợ chua sau ăn" thay vì gõ từ y khoa.</li>
+          <li style="font-size:12.5px;"><b>Giải thích lý do gợi ý:</b> Nói rõ vì sao ca này nên khám Tiêu hóa để không tốn 1,2 triệu khám nhầm Tim.</li>
+          <li style="font-size:12.5px;"><b>Ba phân tầng giá rõ ràng:</b> BS Hoàng (550k, ca thường) vs PGS Công (1,5tr, ca khó) vs BS Mai (700k, ca sớm).</li>
+          <li style="font-size:12.5px;"><b>Gợi ý thay thế khi kín lịch:</b> Khi bác sĩ đầu ngành hết chỗ, tự đề xuất bác sĩ cùng chuyên môn trong kíp.</li>
+          <li style="font-size:12.5px;"><b>Chốt chặn cấp cứu 115:</b> Phát hiện đau tức ngực lan cánh tay sẽ khóa đặt lịch thường, hiện màn hình gọi 115.</li>
+        </ul>
+      </div>
+      <div class="callout" style="padding:8px 12px; font-size:11.5px; margin-top:8px;">
+        <i class="ph-bold ph-thumbs-up"></i> Thử nghiệm với 3 người dùng: Cả 3 người đều thích việc biết trước chi phí và cảm thấy đỡ hoang mang khi đặt lịch.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">08 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 9: RỦI RO AN TOÀN, ĐẠO ĐỨC & TUÂN THỦ -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-shield-check"></i> AN TOÀN Y TẾ &amp; ĐẠO ĐỨC</span>
+    <h2>An toàn sinh mạng là trên hết: Không chẩn đoán ẩu, không ép mua gói đắt</h2>
+    <div class="grid2" style="margin-top:8px;">
+      <div class="card bone">
+        <span class="card-badge" style="color:var(--badge-alert);">ƯU TIÊN 01</span>
+        <h3>Bộ lọc Cờ đỏ Cấp cứu (Emergency Red Flags)</h3>
+        <p style="margin-top:4px; font-size:12.5px; line-height:1.4;">Quy tắc cứng: Khi nhận thấy dấu hiệu đột quỵ hay nhồi máu cơ tim, lập tức khóa luồng đặt hẹn thường và hiện số cấp cứu 115. AI không được phép làm trễ ca cấp cứu.</p>
+      </div>
+      <div class="card bone">
+        <span class="card-badge">NGUYÊN TẮC 02</span>
+        <h3>Phân luồng, không chẩn đoán bệnh</h3>
+        <p style="margin-top:4px; font-size:12.5px; line-height:1.4;">Hệ thống chỉ gợi ý chuyên khoa và bác sĩ phù hợp, tuyệt đối không kết luận bệnh; điều dưỡng quầy tiếp đón có toàn quyền đổi khoa nếu thấy cần thiết.</p>
+      </div>
+      <div class="card bone">
+        <span class="card-badge">CÔNG BẰNG 03</span>
+        <h3>Không ép bệnh nhân khám gói đắt</h3>
+        <p style="margin-top:4px; font-size:12.5px; line-height:1.4;">Luôn ưu tiên hiển thị gói Tiêu chuẩn (550k–700k) cho các ca bệnh nhẹ ngoại trú; không hướng bệnh nhân vào các gói chuyên gia đắt tiền khi chưa có chỉ định.</p>
+      </div>
+      <div class="card bone">
+        <span class="card-badge">BẢO MẬT 04</span>
+        <h3>Bảo vệ dữ liệu theo Nghị định 13/2023/NĐ-CP</h3>
+        <p style="margin-top:4px; font-size:12.5px; line-height:1.4;">Ẩn danh toàn bộ mô tả triệu chứng, mã hóa dữ liệu theo chuẩn y tế, và không dùng lời kể của bệnh nhân để huấn luyện các mô hình AI thương mại bên ngoài.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLINICAL GOVERNANCE FLOW DIAGRAM FILLING LOWER HALF -->
+  <div class="flow-track" style="margin-top:8px;">
+    <div class="flow-title" style="color:var(--primary);"><i class="ph-bold ph-shield-chevron"></i> QUY TRÌNH GIÁM SÁT LÂM SÀNG CÓ CON NGƯỜI (HUMAN-IN-THE-LOOP)</div>
+    <div class="flow-steps">
+      <div class="flow-step-node" style="background:#f8fafc;">Bệnh nhân kể triệu chứng</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step-node bad">Lọc Cờ đỏ Cấp cứu (Triage Halt)</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step-node" style="background:#f0f7ff;">AI gợi ý 3 lựa chọn bác sĩ</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step-node" style="background:#fef3c7; color:#92400e;">Điều dưỡng quầy tiếp đón rà soát lại</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step-node good">Bác sĩ thăm khám trực tiếp</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">09 / 10</span>
+  </div>
+</section>
+
+<!-- SLIDE 10: COACH PLAN K4 & KẾT LUẬN -->
+<section class="slide">
+  <div>
+    <span class="kicker"><i class="ph-bold ph-compass"></i> BÀI HỌC CHO KHÓA TIẾP THEO</span>
+    <h2>Kinh nghiệm thực hiện dự án và cách định hướng cho nhóm K4</h2>
+    <div class="tl">
+      <div class="step"><b>D1</b>Chốt khoảnh khắc; quy tắc phỏng vấn "3 Không"</div>
+      <div class="step"><b>D2–3</b>Trải nghiệm app thực tế; phỏng vấn sâu P1–P3 ghi chép trích dẫn</div>
+      <div class="step"><b>D4</b>Vẽ journey map; viết Need statement Biodesign</div>
+      <div class="step"><b>D5</b>Học cách làm của Ada &amp; Zocdoc; dựng Prototype</div>
+      <div class="step"><b>D6</b>Mời 3 người dùng thử để đo mức độ an tâm về giá</div>
+      <div class="step"><b>D7</b>Lập ma trận an toàn y tế, hoàn thiện deck 10 slide</div>
+    </div>
+  </div>
+
+  <!-- DELIVERABLES CHECKLIST GRID FOR K4 FILLING LOWER HALF -->
+  <div class="grid3" style="margin-top:10px;">
+    <div class="card bone">
+      <h3 style="font-size:13.5px; color:var(--primary); margin-bottom:5px;"><i class="ph-bold ph-magnifying-glass"></i> 1. Nghiên cứu thực tế</h3>
+      <ul class="bullets" style="margin-top:2px;">
+        <li style="font-size:12px;">Phỏng vấn "3 Không": Không hỏi sâu về bệnh lý cá nhân.</li>
+        <li style="font-size:12px;">Trực tiếp dùng thử ứng dụng đóng vai người bệnh để thấu hiểu điểm đau.</li>
+        <li style="font-size:12px;">Tìm đúng điểm làm người bệnh ức chế nhất trên hành trình.</li>
+      </ul>
+    </div>
+    <div class="card bone">
+      <h3 style="font-size:13.5px; color:var(--primary); margin-bottom:5px;"><i class="ph-bold ph-cpu"></i> 2. Thiết kế sản phẩm</h3>
+      <ul class="bullets" style="margin-top:2px;">
+        <li style="font-size:12px;">Need statement Biodesign: Tuyệt đối không chứa giải pháp.</li>
+        <li style="font-size:12px;">Prototype y tế: Bắt buộc có chốt chặn cấp cứu an toàn.</li>
+        <li style="font-size:12px;">Dùng sơ đồ cơ thể và từ ngữ đời thường thay từ sách vở.</li>
+      </ul>
+    </div>
+    <div class="card bone">
+      <h3 style="font-size:13.5px; color:var(--primary); margin-bottom:5px;"><i class="ph-bold ph-scales"></i> 3. Trách nhiệm y đức</h3>
+      <ul class="bullets" style="margin-top:2px;">
+        <li style="font-size:12px;">Không để AI chẩn đoán bệnh; không thương mại hóa ép giá.</li>
+        <li style="font-size:12px;">Bảo vệ dữ liệu người bệnh theo Nghị định 13/2023/NĐ-CP.</li>
+        <li style="font-size:12px;">Hiểu đúng vai trò của AI là hỗ trợ kết nối, không thay thế bác sĩ.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card dark" style="padding:10px 16px; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+    <div style="font-size:13px; font-weight:600;">
+      <i class="ph-bold ph-heart" style="color:#f4a8a0;"></i> Mục tiêu của AI ở đây rất hẹp: giúp người bệnh tìm đúng bác sĩ và đỡ mất tiền oan, chứ không bao giờ chẩn đoán thay bác sĩ.
+    </div>
+    <span style="font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700; color:#38bdf8; background:rgba(56,189,248,0.15); padding:3px 10px; border-radius:9999px; border:1px solid rgba(56,189,248,0.3); white-space:nowrap; margin-left:12px;">
+      VINMEC 2026
+    </span>
+  </div>
+
+  <div class="footer">
+    <span>Bài tập 1 tuần — Vinmec Exploration Sprint</span>
+    <span class="footer-page">10 / 10</span>
+  </div>
+</section>
+
+</body>
+</html>
